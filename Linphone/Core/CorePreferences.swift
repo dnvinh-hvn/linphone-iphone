@@ -161,7 +161,7 @@ class CorePreferences {
 	
 	static var friendListInWhichStoreNewlyCreatedFriends: String {
 		get {
-			return Config.get().getString(section: "app", key: "friend_list_to_store_newly_created_contacts", defaultString: "Linphone address-book")
+			return Config.get().getString(section: "app", key: "friend_list_to_store_newly_created_contacts", defaultString: "SoftPhone address-book")
 		}
 		set {
 			Config.get().setString(section: "app", key: "friend_list_to_store_newly_created_contacts", value: newValue)
@@ -198,8 +198,8 @@ class CorePreferences {
 	
 	static var themeMainColor: String {
 		get {
-			let raw = Config.get().getString(section: "ui", key: "theme_main_color", defaultString: "orange")
-			return safeString(raw, defaultValue: "orange")
+			let raw = Config.get().getString(section: "ui", key: "theme_main_color", defaultString: "blue")
+			return safeString(raw, defaultValue: "blue")
 		}
 		set {
 			Config.get().setString(section: "ui", key: "theme_main_color", value: newValue)
@@ -282,7 +282,7 @@ class CorePreferences {
     
 	static var disableChatFeature: Bool {
 		get {
-			return Config.get().getBool(section: "ui", key: "disable_chat_feature", defaultValue: false)
+			return Config.get().getBool(section: "ui", key: "disable_chat_feature", defaultValue: true)
 		}
 		set {
 			Config.get().setBool(section: "ui", key: "disable_chat_feature", value: newValue)

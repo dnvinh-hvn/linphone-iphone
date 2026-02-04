@@ -26,9 +26,9 @@ class AccountLoginViewModel: ObservableObject {
 	
 	@Published var username: String = ""
 	@Published var passwd: String = ""
-	@Published var domain: String = "sip.linphone.org"
+	@Published var domain: String = "192.168.100.187"
 	@Published var displayName: String = ""
-	@Published var transportType: String = "TLS"
+	@Published var transportType: String = "UDP"
 	@Published var authId: String = ""
 	@Published var outboundProxy: String = ""
 	
@@ -160,8 +160,8 @@ class AccountLoginViewModel: ObservableObject {
 				core.defaultAccount = account
 				
 				DispatchQueue.main.async {
-					self.domain = "sip.linphone.org"
-					self.transportType = "TLS"
+					self.domain = "192.168.100.187"
+					self.transportType = "UDP"
 					self.authId = ""
 					self.outboundProxy = ""
 				}

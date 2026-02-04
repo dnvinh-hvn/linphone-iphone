@@ -1731,6 +1731,7 @@ struct ConversationsContainer: View {
 	}
 }
 
+
 struct MeetingsContainer: View {
 	@Binding var meetingsListViewModel: MeetingsListViewModel?
 	@Binding var isShowScheduleMeetingFragment: Bool

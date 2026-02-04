@@ -178,5 +178,5 @@ struct PopupUpdatePassword: View {
 }
 
 #Preview {
-	PopupUpdatePassword(isShowUpdatePasswordPopup: .constant(true), passwordUpdateAddress: .constant("example@sip.linphone.org"))
+	PopupUpdatePassword(isShowUpdatePasswordPopup: .constant(true), passwordUpdateAddress: .constant("example@192.168.100.187"))
 }

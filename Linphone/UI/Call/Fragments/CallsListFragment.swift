@@ -116,7 +116,7 @@ struct CallsListFragment: View {
 						isShowCallsListFragment.toggle()
 					},
 					titleThirdButton: Text("dialog_cancel"),
-					actionThirdButton: { self.isShowPopup.toggle() },
+					actionThirdButton: { self.isShowPopup.toggle() }
 				)
 				.background(.black.opacity(0.65))
 				.onTapGesture {

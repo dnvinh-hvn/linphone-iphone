@@ -10,15 +10,15 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.belledonne-communications.linphone</string>
-		<string>group.org.linphone.phone.linphoneExtension</string>
-		<string>group.org.linphone.phone.msgNotification</string>
+		<string>group.com.hansol.sipphone.linphone</string>
+		<string>group.com.hansol.sipphone.linphoneExtension</string>
+		<string>group.com.hansol.sipphone.msgNotificationService</string>
 	</array>
 	<key>com.apple.security.files.user-selected.read-only</key>
 	<true/>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)org.linphone.phone</string>
+		<string>$(AppIdentifierPrefix)com.hansol.sipphone</string>
 	</array>
 </dict>
 </plist>

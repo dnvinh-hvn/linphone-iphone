@@ -205,7 +205,7 @@ struct SettingsFragment: View {
 								.zIndex(-2)
 								.transition(.move(edge: .top))
 							}
-							
+							/*
 							HStack(alignment: .center) {
 								Text("settings_conversations_title")
 									.default_text_style_800(styleSize: 18)
@@ -243,7 +243,7 @@ struct SettingsFragment: View {
 								.padding(.horizontal)
 								.zIndex(-3)
 								.transition(.move(edge: .top))
-							}
+							}*/
 							
 							HStack(alignment: .center) {
 								Text("settings_contacts_title")
@@ -440,6 +440,7 @@ struct SettingsFragment: View {
 								.transition(.move(edge: .top))
 							}
 							
+                            /*
 							HStack(alignment: .center) {
 								Text("settings_network_title")
 									.default_text_style_800(styleSize: 18)
@@ -481,7 +482,7 @@ struct SettingsFragment: View {
 								.zIndex(-6)
 								.transition(.move(edge: .top))
 							}
-							
+							*/
 							/*
 							// Hide User interface (Dark mode)
 							
@@ -527,7 +528,7 @@ struct SettingsFragment: View {
 								.transition(.move(edge: .top))
 							}
 							*/
-							NavigationLink(destination: {
+							/*NavigationLink(destination: {
 								SettingsAdvancedFragment(settingsViewModel: settingsViewModel)
 							}, label: {
 								HStack(alignment: .center) {
@@ -549,7 +550,7 @@ struct SettingsFragment: View {
 							})
 							.padding(.vertical, 10)
 							.padding(.horizontal, 20)
-							.background(Color.gray100)
+							.background(Color.gray100)*/
 						}
 					}
 					.background(Color.gray100)

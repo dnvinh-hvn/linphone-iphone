@@ -25,12 +25,11 @@ struct SplashScreen: View {
 			Color.white
 				.ignoresSafeArea()
 			
-			Image("linphone")
+			Image("hansol")
 				.resizable()
-				.renderingMode(.template)
+                .renderingMode(.original)
 				.aspectRatio(contentMode: .fit)
-				.frame(width: 240, height: 128)
-				.foregroundColor(ThemeManager.shared.currentTheme.main500)
+				.frame(width: 640, height: 128)
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.ignoresSafeArea(.all)

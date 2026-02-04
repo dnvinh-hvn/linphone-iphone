@@ -26,14 +26,10 @@ struct WelcomePage1Fragment: View {
 		VStack {
 			Spacer()
 			VStack {
-				Image("linphone")
-					.renderingMode(.template)
+				Image("hansol")
+                    .renderingMode(.original)
 					.resizable()
-					.foregroundStyle(Color.orangeMain500)
-					.frame(width: 100, height: 100)
-				Text(Bundle.main.displayName)
-					.welcome_text_style_gray_800(styleSize: 30)
-					.padding(.bottom, 20)
+					.frame(width: 500, height: 100)
 				Text("welcome_page_1_message")
 					.welcome_text_style_gray(styleSize: 15)
 					.multilineTextAlignment(.center)

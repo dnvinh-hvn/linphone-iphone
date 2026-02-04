@@ -91,24 +91,8 @@ struct ThirdPartySipAccountLoginFragment: View {
 	func innerScrollView(geometry: GeometryProxy) -> some View {
 		VStack {
 			ZStack {
-				HStack {
-					Image("caret-left")
-						.renderingMode(.template)
-						.resizable()
-						.foregroundStyle(Color.grayMain2c500)
-						.frame(width: 25, height: 25)
-						.padding(.all, 10)
-						.onTapGesture {
-							withAnimation {
-								accountLoginViewModel.domain = "sip.linphone.org"
-								accountLoginViewModel.transportType = "TLS"
-								dismiss()
-							}
-						}
-					Spacer()
-				}
 				
-				Text("assistant_login_third_party_sip_account")
+				Text("HANSOL - SIPPHONE")
 					.default_text_style_800(styleSize: 20)
 			}
 			.frame(width: geometry.size.width)
@@ -180,7 +164,7 @@ struct ThirdPartySipAccountLoginFragment: View {
 					.default_text_style_700(styleSize: 15)
 					.padding(.bottom, -5)
 				
-				TextField("sip.linphone.org", text: $accountLoginViewModel.domain)
+				TextField("192.168.100.187", text: $accountLoginViewModel.domain)
 					.default_text_style(styleSize: 15)
 					.disableAutocorrection(true)
 					.autocapitalization(.none)
@@ -215,103 +199,7 @@ struct ThirdPartySipAccountLoginFragment: View {
 					)
 					.padding(.bottom)
 					.focused($isDisplayNameFocused)
-				
-				Text(String(localized: "assistant_sip_account_transport_protocol"))
-					.default_text_style_700(styleSize: 15)
-					.padding(.bottom, -5)
-				
-				Menu {
-					Button("TLS") {accountLoginViewModel.transportType = "TLS"}
-					Button("TCP") {accountLoginViewModel.transportType = "TCP"}
-					Button("UDP") {accountLoginViewModel.transportType = "UDP"}
-				} label: {
-					Text(accountLoginViewModel.transportType)
-						.default_text_style(styleSize: 15)
-						.frame(maxWidth: .infinity, alignment: .leading)
-					Image("caret-down")
-						.renderingMode(.template)
-						.resizable()
-						.foregroundStyle(Color.grayMain2c500)
-						.frame(width: 20, height: 20)
-				}
-				.frame(height: 25)
-				.padding(.horizontal, 20)
-				.padding(.vertical, 15)
-				.cornerRadius(60)
-				.overlay(
-					RoundedRectangle(cornerRadius: 60)
-						.inset(by: 0.5)
-						.stroke(Color.gray200, lineWidth: 1)
-				)
-				.padding(.bottom)
-                
-                HStack(alignment: .center) {
-                    Text("settings_advanced_title")
-                        .default_text_style_800(styleSize: 18)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    Spacer()
-                    
-                    Image(advancedSettingsIsOpen ? "caret-up" : "caret-down")
-                        .renderingMode(.template)
-                        .resizable()
-                        .foregroundStyle(Color.grayMain2c600)
-                        .frame(width: 25, height: 25, alignment: .leading)
-                        .padding(.all, 10)
-                }
-                .padding(.top, 10)
-                .padding(.bottom, 10)
-                .background(.white)
-                .onTapGesture {
-                    withAnimation {
-                        advancedSettingsIsOpen.toggle()
-                    }
-                }
-                
-                if advancedSettingsIsOpen {
-                    VStack(alignment: .leading) {
-                        Text("authentication_id")
-                            .default_text_style_700(styleSize: 15)
-                            .padding(.bottom, -5)
-                        
-						TextField("authentication_id", text: $accountLoginViewModel.authId)
-							.id(1)
-                            .default_text_style(styleSize: 15)
-                            .frame(height: 25)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 15)
-                            .background(.white)
-                            .cornerRadius(60)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 60)
-                                    .inset(by: 0.5)
-                                    .stroke(isAuthIdFocused ? Color.orangeMain500 : Color.gray200, lineWidth: 1)
-                            )
-                            .focused($isAuthIdFocused)
-                    }
-                    
-                    VStack(alignment: .leading) {
-                        Text("account_settings_sip_proxy_url_title")
-                            .default_text_style_700(styleSize: 15)
-                            .padding(.bottom, -5)
-                        
-                        TextField("account_settings_sip_proxy_url_title", text: $accountLoginViewModel.outboundProxy)
-							.id(2)
-                            .default_text_style(styleSize: 15)
-                            .frame(height: 25)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 15)
-                            .background(.white)
-                            .cornerRadius(60)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 60)
-                                    .inset(by: 0.5)
-                                    .stroke(isOutboundProxyFocused ? Color.orangeMain500 : Color.gray200, lineWidth: 1)
-                            )
-                            .focused($isOutboundProxyFocused)
-                    }
-                    .padding(.bottom)
-                }
+            
 			}
 			.frame(maxWidth: SharedMainViewModel.shared.maxWidth)
 			.padding(.horizontal, 20)

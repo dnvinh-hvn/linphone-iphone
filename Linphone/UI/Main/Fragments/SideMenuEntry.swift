@@ -47,7 +47,7 @@ struct SideMenuEntry: View {
 
 #Preview {
 	SideMenuEntry(
-		iconName: "linphone",
+		iconName: "hansol",
 		title: "some text"
 	)
 }

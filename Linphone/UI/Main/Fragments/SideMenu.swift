@@ -49,14 +49,11 @@ struct SideMenu: View {
 			VStack {
 				VStack {
 					HStack {
-						Image("linphone")
-							.renderingMode(.template)
+						Image("hansol")
+                            .renderingMode(.original)
 							.resizable()
-							.foregroundStyle(Color.orangeMain500)
-							.frame(width: 32, height: 32)
+							.frame(width: 150, height: 32)
 							.padding(10)
-						Text(Bundle.main.displayName)
-							.default_text_style_800(styleSize: 16)
 						Spacer()
 						Image("x")
 							.renderingMode(.template)
@@ -84,37 +81,6 @@ struct SideMenu: View {
 						Text("drawer_menu_no_account_configured_yet")
 							.text_style(fontSize: 16, fontWeight: 800, fontColor: Color.grayMain2c600)
 							.padding(.bottom, 30)
-					}
-					
-					HStack {
-						Image("plus-circle")
-							.renderingMode(.template)
-							.resizable()
-							.foregroundStyle(Color.orangeMain500)
-							.frame(width: 20, height: 20)
-						
-						Text("drawer_menu_add_account")
-							.default_text_style_orange_600(styleSize: 20)
-							.frame(height: 35)
-					}
-					.frame(maxWidth: .infinity)
-					.padding(.horizontal, 20)
-					.padding(.vertical, 10)
-					.cornerRadius(60)
-					.overlay(
-						RoundedRectangle(cornerRadius: 60)
-							.inset(by: 0.5)
-							.stroke(Color.orangeMain500, lineWidth: 1)
-					)
-					.padding(.leading, 16)
-					.padding(.trailing, 16)
-					.padding(.bottom, 23)
-					.background()
-					.onTapGesture {
-						self.menuClose()
-						withAnimation {
-							isShowLoginFragment = true
-						}
 					}
 					
 					Rectangle()

@@ -48,9 +48,9 @@ class SharedMainViewModel: ObservableObject {
     @Published var missedCallsCount: Int = 0
 	@Published var cardDavFriendsListsCount: Int = 0
 	
-	@Published var disableVideoCall: Bool = false
-	@Published var disableChatFeature: Bool = false
-	@Published var disableMeetingFeature: Bool = false
+	@Published var disableVideoCall: Bool = true
+	@Published var disableChatFeature: Bool = true
+	@Published var disableMeetingFeature: Bool = true
 	
 	let welcomeViewKey = "welcome_view"
 	let generalTermsKey = "general_terms"

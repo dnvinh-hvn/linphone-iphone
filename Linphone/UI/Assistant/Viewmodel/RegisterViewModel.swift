@@ -37,7 +37,7 @@ class RegisterViewModel: ObservableObject {
 	@Published var phoneNumberError: String = ""
 	@Published var passwd: String = ""
 	@Published var passwordError: String = ""
-	@Published var domain: String = "sip.linphone.org"
+	@Published var domain: String = "192.168.100.187"
 	@Published var displayName: String = ""
 	@Published var transportType: String = "TLS"
 	

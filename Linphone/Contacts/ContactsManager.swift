@@ -35,7 +35,7 @@ final class ContactsManager: ObservableObject {
 	private var coreContext = CoreContext.shared
 	
 	private let nativeAddressBookFriendList = "Native address-book"
-	let linphoneAddressBookFriendList = "Linphone address-book"
+	let linphoneAddressBookFriendList = "SoftPhone address-book"
     let tempRemoteAddressBookFriendList = "TempRemoteDirectoryContacts address-book"
 	
 	var friendList: FriendList?

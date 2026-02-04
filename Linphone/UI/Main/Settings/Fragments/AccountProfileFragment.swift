@@ -624,18 +624,11 @@ struct AccountProfileFragment: View {
 				}
 				
 				if self.isShowLogoutPopup {
-					let localizedString = NSLocalizedString("manage_account_dialog_remove_account_message", comment: "")
-					
-					let components = localizedString.components(separatedBy: " ")
-					let textPart = components.dropLast().joined(separator: " ")
-					
-					let contentPopup1 = Text(textPart + " ")
-					let contentPopup2 = Text("[https://sip.linphone.org](https://sip.linphone.org)").underline()
 					
 					PopupView(
 						isShowPopup: $isShowLogoutPopup,
-						title: Text("manage_account_dialog_remove_account_title"),
-						content: contentPopup1 + contentPopup2,
+						title: Text("manage_account_delete"),
+						content: Text("manage_account_dialog_remove_account_title"),
 						titleFirstButton: nil,
 						actionFirstButton: {},
 						titleSecondButton: Text("manage_account_delete"),

@@ -71,7 +71,7 @@ struct RegisterFragment: View {
 								registerViewModel.phoneNumberConfirmedByUser()
 							},
 							titleThirdButton: Text("dialog_cancel"),
-							actionThirdButton: { self.isShowPopup = false },
+							actionThirdButton: { self.isShowPopup = false }
 						)
 						.background(.black.opacity(0.65))
 						.onTapGesture {

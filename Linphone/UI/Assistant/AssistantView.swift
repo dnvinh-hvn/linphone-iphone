@@ -27,7 +27,8 @@ struct AssistantView: View {
 		if SharedMainViewModel.shared.displayProfileMode && coreContext.loggedIn {
 			ProfileModeFragment()
 		} else {
-			LoginFragment()
+//            LoginFragment()
+            ThirdPartySipAccountLoginFragment(accountLoginViewModel: AccountLoginViewModel())
 		}
 	}
 }
