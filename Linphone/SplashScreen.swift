@@ -25,11 +25,11 @@ struct SplashScreen: View {
 			Color.white
 				.ignoresSafeArea()
 			
-			Image("hansol")
+			Image("handsol_inticube")
 				.resizable()
                 .renderingMode(.original)
 				.aspectRatio(contentMode: .fit)
-				.frame(width: 640, height: 128)
+				.frame(width: 240, height: 180)
 		}
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.ignoresSafeArea(.all)

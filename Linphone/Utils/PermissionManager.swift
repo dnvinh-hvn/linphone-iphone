@@ -19,7 +19,6 @@
 
 import Foundation
 import Photos
-import Contacts
 import UserNotifications
 import SwiftUI
 import Network
@@ -43,9 +42,7 @@ class PermissionManager: ObservableObject {
 			
 			dispatchGroup.enter()
 			self.microphoneRequestPermission()
-			self.photoLibraryRequestPermission()
-			self.cameraRequestPermission()
-			self.contactsRequestPermission(group: dispatchGroup)
+			self.photoLibraryRequestPermission(group: dispatchGroup)
 			
 			dispatchGroup.notify(queue: .main) {
 				// Now request local network authorization last
@@ -75,30 +72,22 @@ class PermissionManager: ObservableObject {
 		})
 	}
 	
-	func photoLibraryRequestPermission() {
+	func photoLibraryRequestPermission(group: DispatchGroup) {
 		PHPhotoLibrary.requestAuthorization(for: .readWrite, handler: {status in
 			DispatchQueue.main.async {
 				self.photoLibraryPermissionGranted = (status == .authorized || status == .limited || status == .restricted)
 			}
+            group.leave()
 		})
 	}
 	
-	func cameraRequestPermission() {
+	func cameraRequestPermission(group: DispatchGroup) {
 		AVCaptureDevice.requestAccess(for: .video, completionHandler: {accessGranted in
 			DispatchQueue.main.async {
 				self.cameraPermissionGranted = accessGranted
 			}
+//            group.leave()
 		})
-	}
-	
-	func contactsRequestPermission(group: DispatchGroup) {
-		let store = CNContactStore()
-		store.requestAccess(for: .contacts) { success, _ in
-			DispatchQueue.main.async {
-				self.contactsPermissionGranted = success
-			}
-			group.leave()
-		}
 	}
 	
 	func requestLocalNetworkAuthorization() {
@@ -131,7 +120,8 @@ class PermissionManager: ObservableObject {
 		let cameraStatus = AVCaptureDevice.authorizationStatus(for: .video)
 		let micStatus = AVAudioSession.sharedInstance().recordPermission
 		let photoStatus = PHPhotoLibrary.authorizationStatus(for: .readWrite)
-		let contactsStatus = CNContactStore.authorizationStatus(for: .contacts)
+//		let contactsStatus = CNContactStore.authorizationStatus(for: .contacts)
+        let contactsStatus: UNAuthorizationStatus = .authorized //disable native contact
 		
 		let notifGroup = DispatchGroup()
 		var notifStatus: UNAuthorizationStatus = .notDetermined

@@ -160,13 +160,13 @@ class CoreContext: ObservableObject {
 			
 			Log.info("Git Info — App: \(appGitTag + "-" + appGitVersion) [\(appGitBranch)] | SDK: \(sdkGitVersion) [\(sdkGitBranch)]")
 			
-			let userAgent = "LinphoneiOS/\(appGitTag) (\(UIDevice.current.localizedModel.replacingOccurrences(of: "'", with: ""))) LinphoneSDK"
+			let userAgent = "SoftphoneiOS/\(appGitTag) (\(UIDevice.current.localizedModel.replacingOccurrences(of: "'", with: ""))) LinphoneSDK"
 			self.mCore.setUserAgent(name: userAgent, version: self.coreVersion)
 			
-			self.mCore.videoCaptureEnabled = true
-			self.mCore.videoDisplayEnabled = true
+			self.mCore.videoCaptureEnabled = false
+			self.mCore.videoDisplayEnabled = false
 			self.mCore.videoPreviewEnabled = false
-			self.mCore.fecEnabled = true
+			self.mCore.fecEnabled = false
 			
 			// Migration
 			self.mCore.config!.setBool(section: "sip", key: "auto_answer_replacing_calls", value: false)
@@ -243,6 +243,7 @@ class CoreContext: ObservableObject {
 							
 							Log.info("Account \(String(describing: newParams?.identityAddress?.asStringUriOnly())) - updating apple push provider from \(String(describing: newParams?.pushNotificationConfig?.provider)) to apns\(pushEnvironment)")
 							newParams?.pushNotificationConfig?.provider = "apns" + pushEnvironment
+                            newParams?.pushNotificationConfig?.voipToken = ""
 							
 							account.params = newParams
 						}

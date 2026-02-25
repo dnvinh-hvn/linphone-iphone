@@ -36,7 +36,7 @@ final class MagicSearchSingleton: ObservableObject {
 	
 	private var limitSearchToLinphoneAccounts = true
 	
-	@Published var allContact = true
+	@Published var allContact = false
 	
 	var linphoneDomain = true
 	var domainDefaultAccount = ""

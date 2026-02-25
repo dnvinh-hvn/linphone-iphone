@@ -21,7 +21,6 @@
 // swiftlint:disable function_parameter_count
 
 import linphonesw
-import Contacts
 import SwiftUI
 import ContactsUI
 import Combine
@@ -116,83 +115,87 @@ final class ContactsManager: ObservableObject {
 				
 				self.refreshCardDavContacts()
 			}
+            self.addFriendListDelegate()
+            self.addCoreDelegate(core: core)
+            MagicSearchSingleton.shared.searchForContacts()
+            //Disable request device contract
 			
-			let store = CNContactStore()
-			store.requestAccess(for: .contacts) { (granted, error) in
-				if let error = error {
-					print("\(#function) - failed to request access", error)
-					self.addFriendListDelegate()
-					self.addCoreDelegate(core: core)
-					MagicSearchSingleton.shared.searchForContacts()
-					return
-				}
-				if granted {
-					let keys = [CNContactEmailAddressesKey, CNContactPhoneNumbersKey,
-								CNContactFamilyNameKey, CNContactGivenNameKey, CNContactNicknameKey,
-								CNContactPostalAddressesKey, CNContactIdentifierKey,
-								CNInstantMessageAddressUsernameKey, CNContactInstantMessageAddressesKey,
-								CNContactOrganizationNameKey, CNContactImageDataAvailableKey, CNContactImageDataKey, CNContactThumbnailImageDataKey]
-					
-					let request = CNContactFetchRequest(keysToFetch: keys as [CNKeyDescriptor])
-					
-					let dispatchGroup = DispatchGroup()
-					
-					do {
-						try store.enumerateContacts(with: request, usingBlock: { (contact, _) in
-							
-							dispatchGroup.enter()
-							
-							let newContact = Contact(
-								identifier: contact.identifier,
-								firstName: contact.givenName,
-								lastName: contact.familyName,
-								organizationName: contact.organizationName,
-								jobTitle: "",
-								displayName: contact.nickname,
-								sipAddresses: contact.instantMessageAddresses.map { $0.value.service.lowercased() == "SIP".lowercased() ? $0.value.username : "" },
-								phoneNumbers: contact.phoneNumbers.map { PhoneNumber(numLabel: $0.label ?? "", num: $0.value.stringValue)},
-								imageData: ""
-							)
-							
-							let imageThumbnail = UIImage(data: contact.thumbnailImageData ?? Data())
-							if let image = imageThumbnail {
-								self.saveImage(
-									image: image,
-									name: contact.givenName + contact.familyName,
-									prefix: "",
-									contact: newContact, linphoneFriend: self.nativeAddressBookFriendList, existingFriend: nil) {
-										dispatchGroup.leave()
-									}
-							} else {
-								let image = self.textToImage(firstName: contact.givenName, lastName: contact.familyName)
-								self.saveImage(
-									image: image,
-									name: contact.givenName + contact.familyName,
-									prefix: "-default",
-									contact: newContact, linphoneFriend: self.nativeAddressBookFriendList, existingFriend: nil) {
-										dispatchGroup.leave()
-									}
-							}
-						})
-						
-						dispatchGroup.notify(queue: .main) {
-							self.addFriendListDelegate()
-							self.addCoreDelegate(core: core)
-							MagicSearchSingleton.shared.searchForContacts()
-						}
-					} catch let error {
-						print("\(#function) - Failed to enumerate contact", error)
-						self.addFriendListDelegate()
-						self.addCoreDelegate(core: core)
-						MagicSearchSingleton.shared.searchForContacts()
-					}
-				} else {
-					print("\(#function) - access denied")
-					self.addFriendListDelegate()
-					self.addCoreDelegate(core: core)
-					MagicSearchSingleton.shared.searchForContacts()
-				}
-			}
+//			let store = CNContactStore()
+//			store.requestAccess(for: .contacts) { (granted, error) in
+//				if let error = error {
+//					print("\(#function) - failed to request access", error)
+//					self.addFriendListDelegate()
+//					self.addCoreDelegate(core: core)
+//					MagicSearchSingleton.shared.searchForContacts()
+//					return
+//				}
+//				if granted {
+//					let keys = [CNContactEmailAddressesKey, CNContactPhoneNumbersKey,
+//								CNContactFamilyNameKey, CNContactGivenNameKey, CNContactNicknameKey,
+//								CNContactPostalAddressesKey, CNContactIdentifierKey,
+//								CNInstantMessageAddressUsernameKey, CNContactInstantMessageAddressesKey,
+//								CNContactOrganizationNameKey, CNContactImageDataAvailableKey, CNContactImageDataKey, CNContactThumbnailImageDataKey]
+//					
+//					let request = CNContactFetchRequest(keysToFetch: keys as [CNKeyDescriptor])
+//					
+//					let dispatchGroup = DispatchGroup()
+//					
+//					do {
+//						try store.enumerateContacts(with: request, usingBlock: { (contact, _) in
+//							
+//							dispatchGroup.enter()
+//							
+//							let newContact = Contact(
+//								identifier: contact.identifier,
+//								firstName: contact.givenName,
+//								lastName: contact.familyName,
+//								organizationName: contact.organizationName,
+//								jobTitle: "",
+//								displayName: contact.nickname,
+//								sipAddresses: contact.instantMessageAddresses.map { $0.value.service.lowercased() == "SIP".lowercased() ? $0.value.username : "" },
+//								phoneNumbers: contact.phoneNumbers.map { PhoneNumber(numLabel: $0.label ?? "", num: $0.value.stringValue)},
+//								imageData: ""
+//							)
+//							
+//							let imageThumbnail = UIImage(data: contact.thumbnailImageData ?? Data())
+//							if let image = imageThumbnail {
+//								self.saveImage(
+//									image: image,
+//									name: contact.givenName + contact.familyName,
+//									prefix: "",
+//									contact: newContact, linphoneFriend: self.nativeAddressBookFriendList, existingFriend: nil) {
+//										dispatchGroup.leave()
+//									}
+//							} else {
+//								let image = self.textToImage(firstName: contact.givenName, lastName: contact.familyName)
+//								self.saveImage(
+//									image: image,
+//									name: contact.givenName + contact.familyName,
+//									prefix: "-default",
+//									contact: newContact, linphoneFriend: self.nativeAddressBookFriendList, existingFriend: nil) {
+//										dispatchGroup.leave()
+//									}
+//							}
+//						})
+//						
+//						dispatchGroup.notify(queue: .main) {
+//							self.addFriendListDelegate()
+//							self.addCoreDelegate(core: core)
+//							MagicSearchSingleton.shared.searchForContacts()
+//						}
+//					} catch let error {
+//						print("\(#function) - Failed to enumerate contact", error)
+//						self.addFriendListDelegate()
+//						self.addCoreDelegate(core: core)
+//						MagicSearchSingleton.shared.searchForContacts()
+//					}
+//				} else {
+//					print("\(#function) - access denied")
+//					self.addFriendListDelegate()
+//					self.addCoreDelegate(core: core)
+//					MagicSearchSingleton.shared.searchForContacts()
+//				}
+//			}
 		}
 	}
 	

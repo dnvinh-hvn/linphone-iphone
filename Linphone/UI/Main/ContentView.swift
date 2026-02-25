@@ -566,61 +566,23 @@ struct ContentView: View {
 															.padding(.all, 10)
 													}
 													.padding(.trailing, 10)
-												} else if sharedMainViewModel.indexView != 2 {
+												} else if sharedMainViewModel.indexView == 1 {
 													Menu {
-														if sharedMainViewModel.indexView == 0 {
-															Button {
-																sharedMainViewModel.displayedFriend = nil
-																isMenuOpen = false
-																magicSearch.changeAllContact(allContactBool: true)
-																magicSearch.searchForContacts()
-															} label: {
-																HStack {
-																	Text("contacts_list_filter_popup_see_all")
-																	Spacer()
-																	if magicSearch.allContact {
-																		Image("green-check")
-																			.resizable()
-																			.frame(width: 25, height: 25, alignment: .leading)
-																			.padding(.all, 10)
-																	}
-																}
-															}
-															
-															Button {
-																sharedMainViewModel.displayedFriend = nil
-																isMenuOpen = false
-																magicSearch.changeAllContact(allContactBool: false)
-																magicSearch.searchForContacts()
-															} label: {
-																HStack {
-																	Text(!magicSearch.linphoneDomain ? String(localized: "contacts_list_filter_popup_see_sip_only") : String(format: String(localized: "contacts_list_filter_popup_see_linphone_only"), Bundle.main.displayName))
-																	Spacer()
-																	if !magicSearch.allContact {
-																		Image("green-check")
-																			.resizable()
-																			.frame(width: 25, height: 25, alignment: .leading)
-																			.padding(.all, 10)
-																	}
-																}
-															}
-														} else {
-															Button(role: .destructive) {
-																isMenuOpen = false
-																isShowDeleteAllHistoryPopup.toggle()
-															} label: {
-																HStack {
-																	Text("menu_delete_history")
-																	Spacer()
-																	Image("trash-simple-red")
-																		.resizable()
-																		.frame(width: 25, height: 25, alignment: .leading)
-																		.padding(.all, 10)
-																}
-															}
-														}
+                                                        Button(role: .destructive) {
+                                                            isMenuOpen = false
+                                                            isShowDeleteAllHistoryPopup.toggle()
+                                                        } label: {
+                                                            HStack {
+                                                                Text("menu_delete_history")
+                                                                Spacer()
+                                                                Image("trash-simple-red")
+                                                                    .resizable()
+                                                                    .frame(width: 25, height: 25, alignment: .leading)
+                                                                    .padding(.all, 10)
+                                                            }
+                                                        }
 													} label: {
-														Image(sharedMainViewModel.indexView == 0 ? "funnel" : "dots-three-vertical")
+														Image("dots-three-vertical")
 															.renderingMode(.template)
 															.resizable()
 															.foregroundStyle(.white)

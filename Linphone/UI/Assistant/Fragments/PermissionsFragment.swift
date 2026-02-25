@@ -54,21 +54,6 @@ struct PermissionsFragment: View {
 	func innerScrollView(geometry: GeometryProxy) -> some View {
 		VStack {
 			ZStack {
-				HStack {
-					Image("caret-left")
-						.renderingMode(.template)
-						.resizable()
-						.foregroundStyle(Color.grayMain2c500)
-						.frame(width: 25, height: 25)
-						.padding(.all, 10)
-						.onTapGesture {
-							withAnimation {
-								dismiss()
-							}
-						}
-					Spacer()
-				}
-				
 				Text("assistant_permissions_title")
 					.default_text_style_800(styleSize: 20)
 			}
@@ -103,23 +88,6 @@ struct PermissionsFragment: View {
 				
 				HStack {
 					HStack(alignment: .center) {
-						Image("address-book")
-							.renderingMode(.template)
-							.resizable()
-							.foregroundStyle(Color.grayMain2c500)
-							.frame(width: 20, height: 20, alignment: .leading)
-					}
-					.padding(16)
-					.background(Color.grayMain2c200)
-					.cornerRadius(40)
-					Text(.init(String(format: String(localized: "assistant_permissions_read_contacts_title"), Bundle.main.displayName)))
-						.default_text_style(styleSize: 15)
-						.padding(.leading, 10)
-				}
-				.padding(.bottom)
-				
-				HStack {
-					HStack(alignment: .center) {
 						Image("microphone")
 							.renderingMode(.template)
 							.resizable()
@@ -135,24 +103,24 @@ struct PermissionsFragment: View {
 						.padding(.leading, 10)
 				}
 				.padding(.bottom)
-				
-				HStack {
-					HStack(alignment: .center) {
-						Image("video-camera")
-							.renderingMode(.template)
-							.resizable()
-							.foregroundStyle(Color.grayMain2c500)
-							.frame(width: 20, height: 20, alignment: .leading)
-					}
-					.padding(16)
-					.background(Color.grayMain2c200)
-					.cornerRadius(40)
-					
-					Text("assistant_permissions_access_camera_title")
-						.default_text_style(styleSize: 15)
-						.padding(.leading, 10)
-				}
-				.padding(.bottom)
+//				
+//				HStack {
+//					HStack(alignment: .center) {
+//						Image("video-camera")
+//							.renderingMode(.template)
+//							.resizable()
+//							.foregroundStyle(Color.grayMain2c500)
+//							.frame(width: 20, height: 20, alignment: .leading)
+//					}
+//					.padding(16)
+//					.background(Color.grayMain2c200)
+//					.cornerRadius(40)
+//					
+//					Text("assistant_permissions_access_camera_title")
+//						.default_text_style(styleSize: 15)
+//						.padding(.leading, 10)
+//				}
+//				.padding(.bottom)
 			}
 			.frame(maxWidth: SharedMainViewModel.shared.maxWidth)
 			.frame(maxHeight: .infinity)

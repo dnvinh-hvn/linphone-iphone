@@ -272,8 +272,8 @@ class CorePreferences {
 	
 	static var defaultDomain: String {
 		get {
-			let raw = Config.get().getString(section: "app", key: "default_domain", defaultString: "sip.linphone.org")
-			return safeString(raw, defaultValue: "sip.linphone.org")
+			let raw = Config.get().getString(section: "app", key: "default_domain", defaultString: "hcloud.inticube.com")
+			return safeString(raw, defaultValue: "hcloud.inticube.com")
 		}
 		set {
 			Config.get().setString(section: "app", key: "default_domain", value: newValue)

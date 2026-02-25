@@ -26,15 +26,20 @@ class AccountLoginViewModel: ObservableObject {
 	
 	@Published var username: String = ""
 	@Published var passwd: String = ""
-	@Published var domain: String = "192.168.100.187"
+	@Published var domain: String = "hcloud.inticube.com"
 	@Published var displayName: String = ""
 	@Published var transportType: String = "UDP"
 	@Published var authId: String = ""
-	@Published var outboundProxy: String = ""
+	@Published var outboundProxy: String = "sip:175.45.194.49:5090"
+    
+    private var accountManagerServices: AccountManagerServices?
+    private var accountManagerServicesRequest: AccountManagerServicesRequest?
 	
 	private var mCoreDelegate: CoreDelegate!
 	
-	init() {}
+	init() {
+        getAccountCreationToken()
+    }
 	
 	func login() {
 		coreContext.doOnCoreQueue { core in
@@ -155,15 +160,16 @@ class AccountLoginViewModel: ObservableObject {
 				// Now let's add our objects to the Core
 				core.addAuthInfo(info: authInfo)
 				try core.addAccount(account: account)
+                self.requestFlexiApiToken(core: core)
 				
 				// Also set the newly added account as default
 				core.defaultAccount = account
 				
 				DispatchQueue.main.async {
-					self.domain = "192.168.100.187"
+					self.domain = "hcloud.inticube.com"
 					self.transportType = "UDP"
 					self.authId = ""
-					self.outboundProxy = ""
+					self.outboundProxy = "sip:175.45.194.49:5090"
 				}
 				
 			} catch { NSLog(error.localizedDescription) }
@@ -202,4 +208,77 @@ class AccountLoginViewModel: ObservableObject {
 			}
 		}
 	}
+    
+    func getAccountCreationToken() {
+        coreContext.doOnCoreQueue { core in
+            do {
+                self.accountManagerServices = try core.createAccountManagerServices()
+                if self.accountManagerServices != nil {
+                    self.accountManagerServices!.language = Locale.current.identifier
+                }
+            } catch {
+                
+            }
+        }
+    }
+    
+    func requestFlexiApiToken(core: Core) {
+        if !core.isPushNotificationAvailable {
+            Log.error(
+                "\(RegisterViewModel.TAG) Core says push notification aren't available, can't request a token from FlexiAPI"
+            )
+            self.onFlexiApiTokenRequestError()
+            return
+        }
+        
+        let pushConfig = core.pushNotificationConfig
+        if pushConfig != nil && self.accountManagerServices != nil {
+#if DEBUG
+                    let pushEnvironment = ".dev"
+#else
+                    let pushEnvironment = ""
+#endif
+            pushConfig!.provider = "apns\(pushEnvironment)"
+            var formatedPnParam = pushConfig!.param
+            formatedPnParam = formatedPnParam?.replacingOccurrences(of: "voip&remote", with: "voip")
+            pushConfig!.param = formatedPnParam
+            
+            let coreRemoteToken = pushConfig!.remoteToken
+            let voipToken = pushConfig!.voipToken ?? ""
+            var formatedRemoteToken = ""
+            if coreRemoteToken != nil {
+                formatedRemoteToken = String(coreRemoteToken!.prefix(64))
+//                pushConfig!.prid = "\(formatedRemoteToken):remote&\(voipToken):voip"
+                pushConfig!.prid = voipToken
+                do {
+                    let request = try self.accountManagerServices!.createSendAccountCreationTokenByPushRequest(
+                        pnProvider: pushConfig?.provider ?? "",
+                        pnParam: pushConfig?.param ?? "",
+                        pnPrid: pushConfig?.prid ?? ""
+                    )
+                    request.submit()
+                } catch {
+                    Log.error("\(RegisterViewModel.TAG) Can't create account creation token by push request")
+                    self.onFlexiApiTokenRequestError()
+                }
+            } else {
+                Log.error("\(RegisterViewModel.TAG) No remote push token available in core for account creator configuration")
+                self.onFlexiApiTokenRequestError()
+            }
+            
+            Log.info("\(RegisterViewModel.TAG) Found push notification info: provider \("apns.dev"), param \(formatedPnParam ?? "error") and prid \(formatedRemoteToken)")
+        } else {
+            Log.error("\(RegisterViewModel.TAG) No push configuration object in Core, shouldn't happen!")
+            self.onFlexiApiTokenRequestError()
+        }
+    }
+    
+    func onFlexiApiTokenRequestError() {
+        Log.error("\(RegisterViewModel.TAG) Flexi API token request by push error!")
+        
+        DispatchQueue.main.async {
+            ToastViewModel.shared.toastMessage = "Failed_push_notification_not_received_error"
+            ToastViewModel.shared.displayToast = true
+        }
+    }
 }

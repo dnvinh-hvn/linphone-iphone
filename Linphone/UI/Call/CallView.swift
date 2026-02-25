@@ -74,6 +74,8 @@ struct CallView: View {
 	@Binding var isShowEditContactFragment: Bool
 	
 	@Binding var isShowScheduleMeetingFragment: Bool
+    
+    let disableCallAction = true
 	
 	var body: some View {
 		GeometryReader { geo in
@@ -335,121 +337,6 @@ struct CallView: View {
                         .padding(.leading, geometry.safeAreaInsets.leading)
                         .padding(.trailing, geometry.safeAreaInsets.trailing)
 						.zIndex(1)
-						
-						if !telecomManager.outgoingCallStarted && telecomManager.callInProgress {
-							if callViewModel.isMediaEncrypted && callViewModel.isRemoteDeviceTrusted && callViewModel.isZrtp {
-								HStack {
-									Image("lock-key")
-										.renderingMode(.template)
-										.resizable()
-										.foregroundStyle(Color.blueInfo500)
-										.frame(width: 15, height: 15, alignment: .leading)
-										.padding(.leading, 50)
-										.padding(.top, 35)
-									
-									Text(callViewModel.isConference ? "call_srtp_point_to_point_encrypted" : "call_zrtp_end_to_end_encrypted")
-										.foregroundStyle(Color.blueInfo500)
-										.default_text_style_white(styleSize: 12)
-										.padding(.top, 35)
-									
-									Spacer()
-								}
-								.onTapGesture {
-									mediaEncryptedSheet = true
-								}
-								.frame(height: topBarHeight)
-								.padding(.leading, geometry.safeAreaInsets.leading)
-								.zIndex(1)
-							} else if callViewModel.isMediaEncrypted && !callViewModel.isZrtp {
-								HStack {
-									Image("lock_simple")
-										.renderingMode(.template)
-										.resizable()
-										.foregroundStyle(Color.blueInfo500)
-										.frame(width: 15, height: 15, alignment: .leading)
-										.padding(.leading, 50)
-										.padding(.top, 35)
-									
-									Text("call_srtp_point_to_point_encrypted")
-										.foregroundStyle(Color.blueInfo500)
-										.default_text_style_white(styleSize: 12)
-										.padding(.top, 35)
-									
-									Spacer()
-								}
-								.onTapGesture {
-									mediaEncryptedSheet = true
-								}
-								.frame(height: topBarHeight)
-								.padding(.leading, geometry.safeAreaInsets.leading)
-								.zIndex(1)
-							} else if callViewModel.isMediaEncrypted && (!callViewModel.isRemoteDeviceTrusted && callViewModel.isZrtp) || callViewModel.cacheMismatch {
-								HStack {
-									Image("warning-circle")
-										.renderingMode(.template)
-										.resizable()
-										.foregroundStyle(Color.orangeWarning600)
-										.frame(width: 15, height: 15, alignment: .leading)
-										.padding(.leading, 50)
-										.padding(.top, 35)
-									
-									Text("call_zrtp_sas_validation_required")
-										.foregroundStyle(Color.orangeWarning600)
-										.default_text_style_white(styleSize: 12)
-										.padding(.top, 35)
-									
-									Spacer()
-								}
-								.onTapGesture {
-									mediaEncryptedSheet = true
-								}
-								.frame(height: topBarHeight)
-								.padding(.leading, geometry.safeAreaInsets.leading)
-								.zIndex(1)
-							} else if callViewModel.isNotEncrypted {
-								HStack {
-									Image("lock_simple")
-										.renderingMode(.template)
-										.resizable()
-										.foregroundStyle(.white)
-										.frame(width: 15, height: 15, alignment: .leading)
-										.padding(.leading, 50)
-										.padding(.top, 35)
-									
-									Text("call_not_encrypted")
-										.foregroundStyle(.white)
-										.default_text_style_white(styleSize: 12)
-										.padding(.top, 35)
-									
-									Spacer()
-								}
-								.onTapGesture {
-									mediaEncryptedSheet = true
-								}
-								.frame(height: topBarHeight)
-								.padding(.leading, geometry.safeAreaInsets.leading)
-								.zIndex(1)
-							} else {
-								HStack {
-									ProgressView()
-										.controlSize(.mini)
-										.progressViewStyle(CircularProgressViewStyle(tint: .white))
-										.frame(width: 15, height: 15, alignment: .leading)
-										.padding(.leading, 50)
-										.padding(.top, 35)
-									
-									Text("call_waiting_for_encryption_info")
-										.foregroundStyle(.white)
-										.default_text_style_white(styleSize: 12)
-										.padding(.top, 35)
-									
-									Spacer()
-								}
-								.frame(height: topBarHeight)
-								.padding(.leading, geometry.safeAreaInsets.leading)
-								.zIndex(1)
-							}
-						}
 					}
                     .frame(height: topBarHeight)
 				}
@@ -2073,42 +1960,11 @@ struct CallView: View {
                             }
                             .buttonStyle(PressedButtonStyle(buttonSize: buttonSize))
                             .frame(width: buttonSize, height: buttonSize)
+                            .disabled(disableCallAction) //disable for this sprint
                             .background(Color.gray500)
                             .cornerRadius(40)
                             
                             Text(callViewModel.callsCounter < 2 ? "call_action_blind_transfer" : "call_action_attended_transfer")
-                                .foregroundStyle(.white)
-                                .default_text_style(styleSize: 15)
-                        }
-                        .frame(width: geo.size.width * 0.24, height: geo.size.width * 0.24)
-                        
-                        VStack {
-                            Button {
-                                withAnimation {
-                                    isShowStartCallFragment.toggle()
-                                }
-                                
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                    telecomManager.callStarted = false
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                        telecomManager.callStarted = true
-                                    }
-                                }
-                            } label: {
-                                HStack {
-                                    Image("phone-plus")
-                                        .renderingMode(.template)
-                                        .resizable()
-                                        .foregroundStyle(.white)
-                                        .frame(width: 32, height: 32)
-                                }
-                            }
-                            .buttonStyle(PressedButtonStyle(buttonSize: buttonSize))
-                            .frame(width: buttonSize, height: buttonSize)
-                            .background(Color.gray500)
-                            .cornerRadius(40)
-                            
-                            Text("call_action_start_new_call")
                                 .foregroundStyle(.white)
                                 .default_text_style(styleSize: 15)
                         }
@@ -2162,6 +2018,7 @@ struct CallView: View {
                             .buttonStyle(PressedButtonStyle(buttonSize: buttonSize))
                             .frame(width: buttonSize, height: buttonSize)
                             .background(Color.gray500)
+                            .disabled(disableCallAction) //disable for this sprint
                             .cornerRadius(40)
                             
                             Text("conference_action_show_participants")
@@ -2196,6 +2053,7 @@ struct CallView: View {
                             .buttonStyle(PressedButtonStyle(buttonSize: buttonSize))
                             .frame(width: buttonSize, height: buttonSize)
                             .background(Color.gray500)
+                            .disabled(disableCallAction) //disable for this sprint
                             .cornerRadius(40)
                             
                             if callViewModel.callsCounter > 1 {
@@ -2247,6 +2105,7 @@ struct CallView: View {
                             .buttonStyle(PressedButtonStyle(buttonSize: buttonSize))
                             .frame(width: buttonSize, height: buttonSize)
                             .background(Color.gray500)
+                            .disabled(disableCallAction) //disable for this sprint
                             .cornerRadius(40)
                             
                             Text("call_action_show_dialer")
@@ -2341,6 +2200,7 @@ struct CallView: View {
 							.frame(width: buttonSize, height: buttonSize)
 							.background(callViewModel.isPaused ? Color.greenSuccess500 : Color.gray500)
 							.cornerRadius(40)
+                            .disabled(disableCallAction) //disable for this sprint
 							.disabled(telecomManager.isPausedByRemote)
 							
 							Text("call_action_pause_call")
@@ -2375,6 +2235,7 @@ struct CallView: View {
 								.background(callViewModel.isRecording ? Color.redDanger500 : Color.gray500)
 								.cornerRadius(40)
 								.disabled(callViewModel.isPaused || telecomManager.isPausedByRemote)
+                                .disabled(disableCallAction) //disable for this sprint
 								
 								Text("call_action_record_call")
 									.foregroundStyle(.white)
@@ -2442,7 +2303,7 @@ struct CallView: View {
                     .frame(width: geo.size.width * 0.24, height: geo.size.width * 0.24)
                     .hidden()
                     
-					if CorePreferences.disableChatFeature || !callViewModel.chatEnabled {
+                    if CorePreferences.disableChatFeature || !callViewModel.chatEnabled {
                         VStack {
                             Button {
                             } label: {
@@ -2500,6 +2361,7 @@ struct CallView: View {
                             .buttonStyle(PressedButtonStyle(buttonSize: buttonSize))
                             .frame(width: buttonSize, height: buttonSize)
                             .background(Color.gray500)
+                            .disabled(disableCallAction)
                             .cornerRadius(40)
                             
                             Text(callViewModel.callsCounter < 2 ? "call_action_blind_transfer" : "call_action_attended_transfer")
@@ -2532,6 +2394,7 @@ struct CallView: View {
                             .buttonStyle(PressedButtonStyle(buttonSize: buttonSize))
                             .frame(width: buttonSize, height: buttonSize)
                             .background(Color.gray500)
+                            .disabled(disableCallAction)
                             .cornerRadius(40)
                             
                             Text("call_action_start_new_call")
@@ -2676,6 +2539,7 @@ struct CallView: View {
                             .buttonStyle(PressedButtonStyle(buttonSize: buttonSize))
                             .frame(width: buttonSize, height: buttonSize)
                             .background(Color.gray500)
+                            .disabled(disableCallAction)
                             .cornerRadius(40)
                             
                             Text("call_action_show_dialer")
@@ -2768,6 +2632,7 @@ struct CallView: View {
 							.background(callViewModel.isPaused ? Color.greenSuccess500 : Color.gray500)
 							.cornerRadius(40)
 							.disabled(telecomManager.isPausedByRemote)
+                            .disabled(disableCallAction)
 							
 							Text("call_action_pause_call")
 								.foregroundStyle(.white)
@@ -2801,6 +2666,7 @@ struct CallView: View {
 								.background(callViewModel.isRecording ? Color.redDanger500 : Color.gray500)
 								.cornerRadius(40)
 								.disabled(callViewModel.isPaused || telecomManager.isPausedByRemote)
+                                .disabled(disableCallAction)
 								
 								Text("call_action_record_call")
 									.foregroundStyle(.white)

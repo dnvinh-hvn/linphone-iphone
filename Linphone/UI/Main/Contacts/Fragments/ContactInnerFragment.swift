@@ -18,7 +18,6 @@
  */
 
 import SwiftUI
-import Contacts
 import ContactsUI
 import linphonesw
 
@@ -306,16 +305,17 @@ struct ContactInnerFragment: View {
 	
 	func editNativeContact() {
 		do {
-			let store = CNContactStore()
-			let descriptor = CNContactViewController.descriptorForRequiredKeys()
-			cnContact = try store.unifiedContact(
-				withIdentifier: contactAvatarModel.nativeUri,
-				keysToFetch: [descriptor]
-			)
-			
-			if cnContact != nil {
-				presentingEditContact.toggle()
-			}
+            //Disable native contact
+//			let store = CNContactStore()
+//			let descriptor = CNContactViewController.descriptorForRequiredKeys()
+//			cnContact = try store.unifiedContact(
+//				withIdentifier: contactAvatarModel.nativeUri,
+//				keysToFetch: [descriptor]
+//			)
+//			
+//			if cnContact != nil {
+//				presentingEditContact.toggle()
+//			}
 		} catch {
 			print(error)
 		}

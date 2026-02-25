@@ -228,23 +228,23 @@ class SharedMainViewModel: ObservableObject {
     }
 	
 	func updateDisableVideoCall() {
-		CoreContext.shared.doOnCoreQueue { core in
-			let disableVideoCallFeatureTmp = !core.videoEnabled
-			
-			DispatchQueue.main.async {
-				self.disableVideoCall = disableVideoCallFeatureTmp
-			}
-		}
+//		CoreContext.shared.doOnCoreQueue { core in
+//			let disableVideoCallFeatureTmp = !core.videoEnabled
+//			
+//			DispatchQueue.main.async {
+//				self.disableVideoCall = disableVideoCallFeatureTmp
+//			}
+//		}
 	}
 	
 	func updateDisableChatFeature() {
-		CoreContext.shared.doOnCoreQueue { core in
-			let disableChatFeatureTmp = CorePreferences.disableChatFeature
-			
-			DispatchQueue.main.async {
-				self.disableChatFeature = disableChatFeatureTmp
-			}
-		}
+//		CoreContext.shared.doOnCoreQueue { core in
+//			let disableChatFeatureTmp = CorePreferences.disableChatFeature
+//			
+//			DispatchQueue.main.async {
+//				self.disableChatFeature = disableChatFeatureTmp
+//			}
+//		}
 	}
 	
 	func updateDisableMeetingFeature() {
