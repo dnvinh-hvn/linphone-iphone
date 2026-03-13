@@ -22,6 +22,7 @@ import linphonesw
 import UserNotifications
 import CallKit
 import PushKit
+import Firebase
 
 let accountTokenNotification = Notification.Name("AccountCreationTokenReceived")
 var displayedChatroomPeerAddr: String?
@@ -82,12 +83,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 	func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
 		let tokenStr = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
 		Log.info("Received remote push token : \(tokenStr)")
-		if let coreContext = coreContext {
-			coreContext.doOnCoreQueue { core in
-				Log.info("Forwarding remote push token to core")
-				core.didRegisterForRemotePushWithStringifiedToken(deviceTokenStr: tokenStr + ":remote")
-			}
-		}
+		// if let coreContext = coreContext {
+		// 	coreContext.doOnCoreQueue { core in
+		// 		Log.info("Forwarding remote push token to core")
+		// 		core.didRegisterForRemotePushWithStringifiedToken(deviceTokenStr: tokenStr + ":remote")
+		// 	}
+		// }
 	}
 	
 	func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -221,12 +222,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             var formatedPnParam = pushConfig!.param
             formatedPnParam = formatedPnParam?.replacingOccurrences(of: "voip&remote", with: "voip")
             pushConfig!.param = formatedPnParam
+            Log.info("formated pn param \(String(describing: formatedPnParam))")
             
-            let coreRemoteToken = pushConfig!.remoteToken
-            let voipToken = pushConfig!.voipToken ?? ""
-            var formatedRemoteToken = ""
-            if coreRemoteToken != nil {
-                formatedRemoteToken = String(coreRemoteToken!.prefix(64))
+            let voipToken = pushConfig!.voipToken
+            if voipToken != nil && self.accountManagerServices != nil {
                 pushConfig!.prid = voipToken
                 do {
                     let request = try self.accountManagerServices!.createSendAccountCreationTokenByPushRequest(
@@ -234,17 +233,18 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                         pnParam: pushConfig?.param ?? "",
                         pnPrid: pushConfig?.prid ?? ""
                     )
+                    Log.info("Submit push token request ")
                     request.submit()
                 } catch {
                     Log.error("\(RegisterViewModel.TAG) Can't create account creation token by push request")
                     
                 }
             } else {
-                Log.error("\(RegisterViewModel.TAG) No remote push token available in core for account creator configuration")
+                Log.error("\(RegisterViewModel.TAG) No remote push voipToken available in core for account creator configuration")
                 
             }
             
-            Log.info("\(RegisterViewModel.TAG) Found push notification info: provider \("apns.dev"), param \(formatedPnParam ?? "error") and prid \(formatedRemoteToken)")
+            Log.info("\(RegisterViewModel.TAG) Found push notification info: provider \("apns.dev"), param \(formatedPnParam ?? "error") and prid \(voipToken)")
         } else {
             Log.error("\(RegisterViewModel.TAG) No push configuration object in Core, shouldn't happen!")
             

@@ -21,6 +21,8 @@ import linphonesw
 import SwiftUI
 
 class AccountLoginViewModel: ObservableObject {
+    
+    static let TAG = "[AccountLoginViewModel]"
 	
 	private var coreContext = CoreContext.shared
 	
@@ -164,7 +166,6 @@ class AccountLoginViewModel: ObservableObject {
 				
 				// Also set the newly added account as default
 				core.defaultAccount = account
-				
 				DispatchQueue.main.async {
 					self.domain = "hcloud.inticube.com"
 					self.transportType = "UDP"
@@ -225,7 +226,7 @@ class AccountLoginViewModel: ObservableObject {
     func requestFlexiApiToken(core: Core) {
         if !core.isPushNotificationAvailable {
             Log.error(
-                "\(RegisterViewModel.TAG) Core says push notification aren't available, can't request a token from FlexiAPI"
+                "\(AccountLoginViewModel.TAG) Core says push notification aren't available, can't request a token from FlexiAPI"
             )
             self.onFlexiApiTokenRequestError()
             return
@@ -243,11 +244,9 @@ class AccountLoginViewModel: ObservableObject {
             formatedPnParam = formatedPnParam?.replacingOccurrences(of: "voip&remote", with: "voip")
             pushConfig!.param = formatedPnParam
             
-            let coreRemoteToken = pushConfig!.remoteToken
-            let voipToken = pushConfig!.voipToken ?? ""
+            let voipToken = pushConfig!.voipToken
             var formatedRemoteToken = ""
-            if coreRemoteToken != nil {
-                formatedRemoteToken = String(coreRemoteToken!.prefix(64))
+            if voipToken != nil {
 //                pushConfig!.prid = "\(formatedRemoteToken):remote&\(voipToken):voip"
                 pushConfig!.prid = voipToken
                 do {
@@ -258,17 +257,17 @@ class AccountLoginViewModel: ObservableObject {
                     )
                     request.submit()
                 } catch {
-                    Log.error("\(RegisterViewModel.TAG) Can't create account creation token by push request")
+                    Log.error("\(AccountLoginViewModel.TAG) Can't create account creation token by push request")
                     self.onFlexiApiTokenRequestError()
                 }
             } else {
-                Log.error("\(RegisterViewModel.TAG) No remote push token available in core for account creator configuration")
+                Log.error("\(AccountLoginViewModel.TAG) No remote voip token available in core for account creator configuration")
                 self.onFlexiApiTokenRequestError()
             }
             
-            Log.info("\(RegisterViewModel.TAG) Found push notification info: provider \("apns.dev"), param \(formatedPnParam ?? "error") and prid \(formatedRemoteToken)")
+            Log.info("\(AccountLoginViewModel.TAG) Found push notification info: provider \("apns.dev"), param \(formatedPnParam ?? "error") and prid \(formatedRemoteToken)")
         } else {
-            Log.error("\(RegisterViewModel.TAG) No push configuration object in Core, shouldn't happen!")
+            Log.error("\(AccountLoginViewModel.TAG) No push configuration object in Core, shouldn't happen!")
             self.onFlexiApiTokenRequestError()
         }
     }

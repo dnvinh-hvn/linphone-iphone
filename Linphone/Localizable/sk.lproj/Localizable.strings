@@ -358,8 +358,8 @@
 "connection_error_for_non_default_account" = "Chyba pripojenia účtu(-ov)";
 "default_account_disabled" = "Zvolený účet je momentálne zakázaný";
 "generic_address_picker_suggestions_list_title" = "Návrhy";
-"help_about_title" = "O aplikácii Linphone";
-"help_about_contribute_translations_title" = "Prispieť do prekladu Linphone";
+"help_about_title" = "O aplikácii SoftPhone";
+"help_about_contribute_translations_title" = "Prispieť do prekladu SoftPhone";
 "help_about_open_source_licenses_subtitle" = "© Belledonne Communications 2010-2024";
 "help_about_open_source_licenses_title" = "GNU General Public License v3.0";
 "list_filter_no_result_found" = "Žiadne výsledky…";

@@ -54,7 +54,7 @@ struct DialerBottomSheet: View {
 					HStack {
 						Spacer()
 						Button("dialog_close") {
-							showingDialer.toggle()
+							showingDialer = false
 							dismiss()
 						}
 					}
@@ -405,8 +405,6 @@ struct DialerBottomSheet: View {
 						Button {
 							if !startCallViewModel.searchField.isEmpty {
 								if callViewModel.isTransferInsteadCall {
-									showingDialer = false
-									
 									magicSearch.currentFilter = ""
 									
 									magicSearch.searchForContacts()
@@ -418,14 +416,13 @@ struct DialerBottomSheet: View {
 									callViewModel.resetCallView()
 									
 									withAnimation {
+                                        showingDialer = false
 										isShowStartCallFragment.toggle()
-										startCallViewModel.interpretAndStartCall()
+                                        callViewModel.interpretAndTransferCall(searchField: startCallViewModel.searchField)
 									}
 									
 									startCallViewModel.searchField = ""
 								} else {
-									showingDialer = false
-									
 									magicSearch.currentFilter = ""
 									
 									magicSearch.searchForContacts()
@@ -437,6 +434,7 @@ struct DialerBottomSheet: View {
 										callViewModel.resetCallView()
 									
 									withAnimation {
+                                        showingDialer = false
 										isShowStartCallFragment.toggle()
 										startCallViewModel.interpretAndStartCall()
 									}
@@ -471,10 +469,11 @@ struct DialerBottomSheet: View {
 					}
 					.padding(.horizontal, 60)
 					.padding(.top, 20)
+					.padding(.bottom, 20)
 					.frame(maxWidth: SharedMainViewModel.shared.maxWidth)
 				}
 				
-				Spacer()
+                Spacer(minLength: 50)
 			}
 			.frame(maxWidth: .infinity)
 			.frame(maxHeight: .infinity)

@@ -67,7 +67,7 @@ struct CallsListFragment: View {
 					
 					Spacer()
 					
-					if callViewModel.callsCounter > 1 {
+                    if callViewModel.calls.count > 1 {
 						Button {
 							self.isShowPopup = true
 						} label: {

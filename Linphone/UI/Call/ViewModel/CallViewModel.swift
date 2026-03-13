@@ -1085,6 +1085,25 @@ class CallViewModel: ObservableObject {
 			}
 		}
 	}
+    
+    func interpretAndTransferCall(searchField: String) {
+        if self.currentCall != nil && self.currentCall!.remoteAddress != nil {
+            self.coreContext.doOnCoreQueue { core in
+                let toAddress = core.interpretUrl(url: searchField, applyInternationalPrefix: LinphoneUtils.applyInternationalPrefix(core: core))
+                if toAddress != nil {
+                    Log.info(
+                        "[CallViewModel] Call \(self.currentCall!.remoteAddress!.asStringUriOnly()) is being blindly transferred to \(toAddress!.asStringUriOnly())"
+                    )
+                    do {
+                        try self.currentCall!.transferTo(referTo: toAddress!)
+                    } catch {
+                        
+                    }
+                    Log.info("[CallViewModel] Blind call transfer is successful")
+                }
+            }
+        }
+    }
 	
 	func toggleAdminParticipant(index: Int) {
 		coreContext.doOnCoreQueue { _ in

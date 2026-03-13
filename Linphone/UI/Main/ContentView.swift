@@ -48,7 +48,6 @@ struct ContentView: View {
 	@State private var searchIsActive = false
 	@State private var text = ""
 	@FocusState private var focusedField: Bool
-	@State private var showingDialer = false
 	@State var isMenuOpen = false
 	@State var isShowDeleteContactPopup = false
 	@State var isShowDeleteAllHistoryPopup = false
@@ -90,7 +89,8 @@ struct ContentView: View {
 	var body: some View {
 		GeometryReader { geometry in
 			VStack(spacing: 0) {
-				if accountProfileViewModel.accountError && (!telecomManager.callInProgress || (telecomManager.callInProgress && !telecomManager.callDisplayed)) {
+                let inCall = !telecomManager.callInProgress || (telecomManager.callInProgress && !telecomManager.callDisplayed)
+                if accountProfileViewModel.accountError && inCall {
 					HStack {
 						if let index = accountProfileViewModel.defaultAccountModelIndex,
 						   index < coreContext.accounts.count, coreContext.accounts[index].isDefaultAccount, coreContext.accounts[index].registrationStateAssociatedUIColor == .orangeWarning600 {
@@ -140,7 +140,7 @@ struct ContentView: View {
 					.background(Color.redDanger500)
 				}
 				
-				if sharedMainViewModel.waitingMessageCount > 0 && (!telecomManager.callInProgress || (telecomManager.callInProgress && !telecomManager.callDisplayed)) {
+				if sharedMainViewModel.waitingMessageCount > 0 && inCall {
 					HStack {
 						Image("voicemail")
 							.renderingMode(.template)
@@ -188,7 +188,7 @@ struct ContentView: View {
 					}
 				}
 				
-				if !sharedMainViewModel.fileUrlsToShare.isEmpty && (!telecomManager.callInProgress || (telecomManager.callInProgress && !telecomManager.callDisplayed)) {
+				if !sharedMainViewModel.fileUrlsToShare.isEmpty && inCall {
 					HStack {
 						Image("share-network")
 							.renderingMode(.template)
@@ -1097,7 +1097,6 @@ struct ContentView: View {
 					if isShowStartCallFragment {
 						StartCallFragment(
 							isShowStartCallFragment: $isShowStartCallFragment,
-							showingDialer: $showingDialer,
 							resetCallView: {callViewModel.resetCallView()}
 						)
 						.environmentObject(callViewModel)

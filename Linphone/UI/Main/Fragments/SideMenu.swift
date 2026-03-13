@@ -95,15 +95,26 @@ struct SideMenu: View {
 							SideMenuShortcut(shortcutModel: CoreContext.shared.shortcuts[index])
 						}
 						
-//						SideMenuEntry(
-//							iconName: "record-fill",
-//							title: "recordings_title"
-//						).onTapGesture {
-//							self.menuClose()
-//							withAnimation {
-//								isShowRecordingsListFragment = true
-//							}
-//						}
+						SideMenuEntry(
+							iconName: "gear",
+							title: "settings_title"
+						).onTapGesture {
+							self.menuClose()
+							withAnimation {
+								isShowSettingsFragment = true
+							}
+						}
+						
+						SideMenuEntry(
+							iconName: "record-fill",
+							title: "recordings_title"
+						).onTapGesture {
+							self.menuClose()
+							withAnimation {
+								isShowRecordingsListFragment = true
+							}
+						}
+
 					}
 					.padding(.bottom, safeAreaInsets.bottom + 13)
 					.padding(.top, 13)

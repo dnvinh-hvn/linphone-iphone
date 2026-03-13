@@ -221,7 +221,7 @@ final class MagicSearchSingleton: ObservableObject {
 			
 			magicSearch.getContactsListAsync(
 				filter: self.currentFilter,
-				domain: self.allContact ? "" : self.domainDefaultAccount,
+				domain: "",
 				sourceFlags: MagicSearch.Source.All.rawValue, //MagicSearch.Source.Friends.rawValue | MagicSearch.Source.LdapServers.rawValue | MagicSearch.Source.RemoteCardDAV.rawValue,
 				aggregation: MagicSearch.Aggregation.Friend
 			)

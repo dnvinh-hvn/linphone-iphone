@@ -26,11 +26,6 @@ struct WelcomePage3Fragment: View {
 		VStack {
 			Spacer()
 			VStack {
-				Image("open-source")
-					.renderingMode(.template)
-					.resizable()
-					.foregroundStyle(Color.orangeMain500)
-					.frame(width: 100, height: 100)
 				Text("welcome_page_3_title")
 					.welcome_text_style_gray_800(styleSize: 30)
 					.padding(.bottom, 20)

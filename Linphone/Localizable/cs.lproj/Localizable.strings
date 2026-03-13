@@ -191,7 +191,7 @@
 "help_about_advanced_title" = "Pokročilé";
 "help_about_check_for_update" = "Kontrola aktualizací";
 "help_about_privacy_policy_title" = "Zásady ochrany soukromí";
-"help_about_user_guide_title" = "Průvodce Linphone";
+"help_about_user_guide_title" = "Průvodce SoftPhone";
 "help_about_user_guide_subtitle" = "Naučte se krok za krokem ovládat všechny funkce aplikace.";
 "help_about_version_title" = "Verze";
 "help_dialog_update_available_title" = "Je dostupná nová aktualizace";
@@ -425,8 +425,8 @@
 "conversation_event_participant_removed" = "%@ se odpojil";
 "conversation_one_to_one_hidden_subject" = "Skrytý předmět";
 "conversation_reply_to_message_title" = "Odpovídá na: ";
-"help_about_contribute_translations_title" = "Přispět do překladu Linphone";
-"help_about_title" = "O aplikaci Linphone";
+"help_about_contribute_translations_title" = "Přispět do překladu SoftPhone";
+"help_about_title" = "O aplikaci SoftPhone";
 "debug_logs_copied_to_clipboard_toast" = "Ladící protokoly zkopírovány do schránky";
 "Default" = "Výchozí";
 "Default mode" = "Výchozí režim";
