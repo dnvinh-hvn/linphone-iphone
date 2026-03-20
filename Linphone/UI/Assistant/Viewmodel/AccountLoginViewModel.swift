@@ -21,11 +21,11 @@ import linphonesw
 import SwiftUI
 
 class AccountLoginViewModel: ObservableObject {
-    
+
     static let TAG = "[AccountLoginViewModel]"
-	
+
 	private var coreContext = CoreContext.shared
-	
+
 	@Published var username: String = ""
 	@Published var passwd: String = ""
 	@Published var domain: String = "hcloud.inticube.com"
@@ -33,15 +33,8 @@ class AccountLoginViewModel: ObservableObject {
 	@Published var transportType: String = "UDP"
 	@Published var authId: String = ""
 	@Published var outboundProxy: String = "sip:175.45.194.49:5090"
-    
-    private var accountManagerServices: AccountManagerServices?
-    private var accountManagerServicesRequest: AccountManagerServicesRequest?
-	
+
 	private var mCoreDelegate: CoreDelegate!
-	
-	init() {
-        getAccountCreationToken()
-    }
 	
 	func login() {
 		coreContext.doOnCoreQueue { core in
@@ -137,41 +130,37 @@ class AccountLoginViewModel: ObservableObject {
 				accountParams.pushNotificationConfig?.provider = "apns" + pushEnvironment
 				
 				self.mCoreDelegate = CoreDelegateStub(onAccountRegistrationStateChanged: { (core: Core, account: Account, state: RegistrationState, message: String) in
-					
+
 					Log.info("New registration state is \(state) for user id " +
 							 "\( String(describing: account.params?.identityAddress?.asString())) = \(message)\n")
-					
+
 					switch state {
+					case .Ok:
+						if let username = account.params?.identityAddress?.username {
+							PushNotificationService.registerIfTokenAvailable(username: username)
+						}
 					case .Failed:  // If registration failed, remove account from core
 						if let authInfo = account.findAuthInfo() {
 							core.removeAuthInfo(info: authInfo)
 						}
-						
 						Log.warn("Registration failed for account \(account.displayName()), deleting it from core")
 						core.removeAccount(account: account)
 					default:
 						break
 					}
 				})
-				
+
 				self.coreContext.mCore.addDelegate(delegate: self.mCoreDelegate)
-				
+
 				// Now that our AccountParams is configured, we can create the Account object
 				let account = try core.createAccount(params: accountParams)
-				
+
 				// Now let's add our objects to the Core
 				core.addAuthInfo(info: authInfo)
 				try core.addAccount(account: account)
-                self.requestFlexiApiToken(core: core)
 				
 				// Also set the newly added account as default
 				core.defaultAccount = account
-				DispatchQueue.main.async {
-					self.domain = "hcloud.inticube.com"
-					self.transportType = "UDP"
-					self.authId = ""
-					self.outboundProxy = "sip:175.45.194.49:5090"
-				}
 				
 			} catch { NSLog(error.localizedDescription) }
 		}
@@ -209,75 +198,4 @@ class AccountLoginViewModel: ObservableObject {
 			}
 		}
 	}
-    
-    func getAccountCreationToken() {
-        coreContext.doOnCoreQueue { core in
-            do {
-                self.accountManagerServices = try core.createAccountManagerServices()
-                if self.accountManagerServices != nil {
-                    self.accountManagerServices!.language = Locale.current.identifier
-                }
-            } catch {
-                
-            }
-        }
-    }
-    
-    func requestFlexiApiToken(core: Core) {
-        if !core.isPushNotificationAvailable {
-            Log.error(
-                "\(AccountLoginViewModel.TAG) Core says push notification aren't available, can't request a token from FlexiAPI"
-            )
-            self.onFlexiApiTokenRequestError()
-            return
-        }
-        
-        let pushConfig = core.pushNotificationConfig
-        if pushConfig != nil && self.accountManagerServices != nil {
-#if DEBUG
-                    let pushEnvironment = ".dev"
-#else
-                    let pushEnvironment = ""
-#endif
-            pushConfig!.provider = "apns\(pushEnvironment)"
-            var formatedPnParam = pushConfig!.param
-            formatedPnParam = formatedPnParam?.replacingOccurrences(of: "voip&remote", with: "voip")
-            pushConfig!.param = formatedPnParam
-            
-            let voipToken = pushConfig!.voipToken
-            var formatedRemoteToken = ""
-            if voipToken != nil {
-//                pushConfig!.prid = "\(formatedRemoteToken):remote&\(voipToken):voip"
-                pushConfig!.prid = voipToken
-                do {
-                    let request = try self.accountManagerServices!.createSendAccountCreationTokenByPushRequest(
-                        pnProvider: pushConfig?.provider ?? "",
-                        pnParam: pushConfig?.param ?? "",
-                        pnPrid: pushConfig?.prid ?? ""
-                    )
-                    request.submit()
-                } catch {
-                    Log.error("\(AccountLoginViewModel.TAG) Can't create account creation token by push request")
-                    self.onFlexiApiTokenRequestError()
-                }
-            } else {
-                Log.error("\(AccountLoginViewModel.TAG) No remote voip token available in core for account creator configuration")
-                self.onFlexiApiTokenRequestError()
-            }
-            
-            Log.info("\(AccountLoginViewModel.TAG) Found push notification info: provider \("apns.dev"), param \(formatedPnParam ?? "error") and prid \(formatedRemoteToken)")
-        } else {
-            Log.error("\(AccountLoginViewModel.TAG) No push configuration object in Core, shouldn't happen!")
-            self.onFlexiApiTokenRequestError()
-        }
-    }
-    
-    func onFlexiApiTokenRequestError() {
-        Log.error("\(RegisterViewModel.TAG) Flexi API token request by push error!")
-        
-        DispatchQueue.main.async {
-            ToastViewModel.shared.toastMessage = "Failed_push_notification_not_received_error"
-            ToastViewModel.shared.displayToast = true
-        }
-    }
 }

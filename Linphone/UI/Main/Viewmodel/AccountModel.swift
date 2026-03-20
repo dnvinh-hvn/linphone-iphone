@@ -286,8 +286,11 @@ class AccountModel: ObservableObject {
 	func logout() {
 		CoreContext.shared.doOnCoreQueue { core in
 			Log.info("Account \(self.account.displayName()) has been removed")
+			if let username = self.account.params?.identityAddress?.username {
+				PushNotificationService.unregisterDevice(username: username)
+			}
 			core.removeAccount(account: self.account)
-			
+
 			if let authInfo = self.account.findAuthInfo() {
 				core.removeAuthInfo(info: authInfo)
 			}

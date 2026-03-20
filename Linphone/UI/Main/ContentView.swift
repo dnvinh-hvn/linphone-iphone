@@ -33,6 +33,7 @@ struct ContentView: View {
 	
 	@ObservedObject private var contactsManager = ContactsManager.shared
 	@ObservedObject private var magicSearch = MagicSearchSingleton.shared
+	@ObservedObject private var dndManager = DNDManager.shared
 	
 	@StateObject private var callViewModel = CallViewModel()
 	@StateObject private var accountProfileViewModel = AccountProfileViewModel()
@@ -533,6 +534,13 @@ struct ContentView: View {
                                                         .frame(width: avatarSize, height: avatarSize)
                                                 }
 
+												// DND Status Indicator
+												if dndManager.isCurrentlyActive {
+													Image(systemName: "bell-slash")
+														.foregroundColor(.white)
+														.font(.system(size: 18))
+														.padding(.leading, 8)
+												}
 												
 												Text(String(localized: sharedMainViewModel.indexView == 0 ? "bottom_navigation_contacts_label" : (sharedMainViewModel.indexView == 1 ? "bottom_navigation_calls_label" : (sharedMainViewModel.indexView == 2 ? "bottom_navigation_conversations_label" : "bottom_navigation_meetings_label"))))
 													.default_text_style_white_800(styleSize: 20)

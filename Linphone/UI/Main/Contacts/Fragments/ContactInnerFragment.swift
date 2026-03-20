@@ -187,7 +187,8 @@ struct ContactInnerFragment: View {
 											CoreContext.shared.doOnCoreQueue { core in
 												if contactAvatarModel.addresses.count == 1 {
 													do {
-														if let url = URL(string: "hantalk_scheme://hantalk_host?chatId=\(contactAvatarModel.address)") {
+                                                        let address = try Factory.Instance.createAddress(addr: contactAvatarModel.address)
+                                                        if let username = address.username, let url = URL(string: "hantalk_scheme://hantalk_host?chatId=\(username)") {
 															try UIApplication.shared.open(url)
 														}
 													} catch {
@@ -195,8 +196,8 @@ struct ContactInnerFragment: View {
 													}
 												} else if contactAvatarModel.addresses.count < 1 && contactAvatarModel.phoneNumbersWithLabel.count == 1 {
 													do {
-														if let firstPhoneNumbersWithLabel = contactAvatarModel.phoneNumbersWithLabel.first, let address = core.interpretUrl(url: firstPhoneNumbersWithLabel.phoneNumber, applyInternationalPrefix: LinphoneUtils.applyInternationalPrefix(core: core)) {
-															if let url = URL(string: "hantalk_scheme://hantalk_host?chatId=\(address.asStringUriOnly())") {
+                                                        if let firstPhoneNumbersWithLabel = contactAvatarModel.phoneNumbersWithLabel.first, let address = core.interpretUrl(url: firstPhoneNumbersWithLabel.phoneNumber, applyInternationalPrefix: LinphoneUtils.applyInternationalPrefix(core: core)), let username = address.username {
+                                                            if let url = URL(string: "hantalk_scheme://hantalk_host?chatId=\( username)") {
 																try UIApplication.shared.open(url)
 															}
 														}

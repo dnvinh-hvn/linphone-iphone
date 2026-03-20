@@ -167,7 +167,6 @@ class CoreContext: ObservableObject {
 			self.mCore.videoDisplayEnabled = false
 			self.mCore.videoPreviewEnabled = false
 			self.mCore.fecEnabled = false
-			
 			// Migration
 			self.mCore.config!.setBool(section: "sip", key: "auto_answer_replacing_calls", value: false)
 			self.mCore.config!.setBool(section: "sip", key: "deliver_imdn", value: false)
@@ -267,54 +266,59 @@ class CoreContext: ObservableObject {
 					}
 				}
 				
-			}, onCallStateChanged: { (core: Core, call: Call, cstate: Call.State, message: String) in
-				TelecomManager.shared.onCallStateChanged(core: core, call: call, state: cstate, message: message)
-				
-				if core.calls.isEmpty {
-					DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-						if UIApplication.shared.applicationState == .background {
-							Log.info("[CoreContext] core is currently in background with no calls, triggering onEnterBackground procedure")
-							self.onEnterBackground()
-						}
-					}
-				}
-			}, onAuthenticationRequested: { (core: Core, authInfo: AuthInfo, method: AuthMethod) in
-				if method == .Bearer {
-					if let server = authInfo.authorizationServer, !server.isEmpty {
-						Log.info("Authentication requested method is Bearer, starting Single Sign On activity with server URL \(server) and username \(authInfo.username ?? "")")
-						self.bearerAuthInfoPendingPasswordUpdate = authInfo
-						SingleSignOnManager.shared.setUp(ssoUrl: server, user: authInfo.username ?? "")
-					}
-				}
-				
-				if method == .HttpDigest {
-					guard let username = authInfo.username, let domain = authInfo.domain, let realm = authInfo.realm else {
-						Log.error("Authentication requested but either username [\(String(describing: authInfo.username))], domain [\(String(describing: authInfo.domain))] or server [\(String(describing: authInfo.authorizationServer))] is nil or empty!")
-						return
-					}
-					
-					guard let accountFound = core.accountList.first(where: {
-						$0.params?.identityAddress?.username == authInfo.username &&
-						$0.params?.identityAddress?.domain == authInfo.domain
-					}) else {
-						Log.info("[CoreContext] Failed to find account matching auth info, aborting auth dialog")
-						return
-					}
-
-					let identity = "\(authInfo.username ?? "username")@\(authInfo.domain ?? "domain")"
-					Log.info("[CoreContext] Authentication requested method is HttpDigest, showing dialog asking user for password for identity [\(identity)]")
-					
-					DispatchQueue.main.async {
-						NotificationCenter.default.post(
-							name: NSNotification.Name("PasswordUpdate"),
-							object: nil,
-							userInfo: ["address": "sip:" + identity]
-						)
-					}
-					
-					self.digestAuthInfoPendingPasswordUpdate = authInfo
-				}
-			}, onTransferStateChanged: { (_: Core, transferred: Call, callState: Call.State) in
+			}, onPushNotificationReceived: {(core: Core, payload: String) in
+                Log.info("[CoreContext]onPushNotificationReceived payload: \(payload)")
+            }, onCallStateChanged: { (core: Core, call: Call, cstate: Call.State, message: String) in
+                TelecomManager.shared.onCallStateChanged(core: core, call: call, state: cstate, message: message)
+                
+                if core.calls.isEmpty {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        if UIApplication.shared.applicationState == .background {
+                            Log.info("[CoreContext] core is currently in background with no calls, triggering onEnterBackground procedure")
+                            self.onEnterBackground()
+                        }
+                    }
+                }
+            }, onAuthenticationRequested: { (core: Core, authInfo: AuthInfo, method: AuthMethod) in
+                if method == .Bearer {
+                    if let server = authInfo.authorizationServer, !server.isEmpty {
+                        Log.info("Authentication requested method is Bearer, starting Single Sign On activity with server URL \(server) and username \(authInfo.username ?? "")")
+                        self.bearerAuthInfoPendingPasswordUpdate = authInfo
+                        SingleSignOnManager.shared.setUp(ssoUrl: server, user: authInfo.username ?? "")
+                    }
+                }
+                
+                if method == .HttpDigest {
+                    guard let username = authInfo.username, let domain = authInfo.domain, let realm = authInfo.realm else {
+                        Log.error("Authentication requested but either username [\(String(describing: authInfo.username))], domain [\(String(describing: authInfo.domain))] or server [\(String(describing: authInfo.authorizationServer))] is nil or empty!")
+                        return
+                    }
+                    
+                    guard let accountFound = core.accountList.first(where: {
+                        $0.params?.identityAddress?.username == authInfo.username &&
+                        $0.params?.identityAddress?.domain == authInfo.domain
+                    }) else {
+                        Log.info("[CoreContext] Failed to find account matching auth info, aborting auth dialog")
+                        return
+                    }
+                    
+                    let identity = "\(authInfo.username ?? "username")@\(authInfo.domain ?? "domain")"
+                    Log.info("[CoreContext] Authentication requested method is HttpDigest, showing dialog asking user for password for identity [\(identity)]")
+                    
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(
+                            name: NSNotification.Name("PasswordUpdate"),
+                            object: nil,
+                            userInfo: ["address": "sip:" + identity]
+                        )
+                    }
+                    
+                    self.digestAuthInfoPendingPasswordUpdate = authInfo
+                }
+            }, onDtmfReceived: {(core: Core, call: Call, dtmf: Int) in
+                Log.info("[CoreContext]onDtmfReceived dtmf: \(dtmf)")
+                core.playDtmf(dtmf: Int8(dtmf), durationMs: 1000)
+            }, onTransferStateChanged: { (_: Core, transferred: Call, callState: Call.State) in
 				Log.info("[CoreContext] Transferred call \(transferred.remoteAddress!.asStringUriOnly()) state changed \(callState)")
 				DispatchQueue.main.async {
 					if callState == Call.State.Connected {
@@ -392,7 +396,7 @@ class CoreContext: ObservableObject {
 					} else if state == .Cleared {
 						self.loggingInProgress = false
 						self.loggedIn = false
-					} else {
+                    } else if state == .Failed {
 						self.loggingInProgress = false
 						self.loggedIn = false
 						if self.networkStatusIsConnected {
@@ -459,7 +463,7 @@ class CoreContext: ObservableObject {
 						}
 					}
 				}
-			})
+            })
 			
 			self.mCore.addDelegate(delegate: self.mCoreDelegate)
 			

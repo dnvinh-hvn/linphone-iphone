@@ -34,11 +34,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         if let coreContext = coreContext {
             coreContext.doOnCoreQueue { core in
                 core.pushNotificationConfig?.voipToken = deviceToken
-                if(self.accountManagerServices == nil) {
-                    self.getAccountCreationToken()
+                if let username = core.defaultAccount?.params?.identityAddress?.username {
+                    PushNotificationService.updateVoipToken(deviceToken, username: username)
                 }
-                self.requestFlexiApiToken(core: core)
             }
+        } else {
+            PushNotificationService.updateVoipToken(deviceToken, username: nil)
         }
     }
     
@@ -78,17 +79,18 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 	var coreContext: CoreContext?
  	var navigationManager: NavigationManager?
     
-    private var accountManagerServices: AccountManagerServices?
 	
 	func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
 		let tokenStr = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
 		Log.info("Received remote push token : \(tokenStr)")
-		// if let coreContext = coreContext {
-		// 	coreContext.doOnCoreQueue { core in
-		// 		Log.info("Forwarding remote push token to core")
-		// 		core.didRegisterForRemotePushWithStringifiedToken(deviceTokenStr: tokenStr + ":remote")
-		// 	}
-		// }
+		if let coreContext = coreContext {
+			coreContext.doOnCoreQueue { core in
+                core.pushNotificationConfig?.remoteToken = tokenStr
+				if let username = core.defaultAccount?.params?.identityAddress?.username {
+                    PushNotificationService.updateDeviceToken(tokenStr, username: username)
+                }
+			}
+		}
 	}
 	
 	func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -117,12 +119,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         let token = voipRegistry.pushToken(for: .voIP)
         print("CallKit current token \(String(describing: token))")
         if let coreContext = coreContext, let token = token {
+            let tokenStr = token.map { String(format: "%02x", $0) }.joined()
             coreContext.doOnCoreQueue { core in
-                core.pushNotificationConfig?.voipToken = String(describing: token)
-                if(self.accountManagerServices == nil) {
-                    self.getAccountCreationToken()
+                core.pushNotificationConfig?.voipToken = tokenStr
+                if let username = core.defaultAccount?.params?.identityAddress?.username {
+                    PushNotificationService.updateVoipToken(tokenStr, username: username)
                 }
-                self.requestFlexiApiToken(core: core)
             }
         }
 		
@@ -189,67 +191,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 			}
 		}
 	}
-    
-    func getAccountCreationToken() {
-        coreContext?.doOnCoreQueue { core in
-            do {
-                self.accountManagerServices = try core.createAccountManagerServices()
-                if self.accountManagerServices != nil {
-                    self.accountManagerServices!.language = Locale.current.identifier
-                }
-            } catch {
-                
-            }
-        }
-    }
-    
-    func requestFlexiApiToken(core: Core) {
-        if !core.isPushNotificationAvailable {
-            Log.error(
-                "\(RegisterViewModel.TAG) Core says push notification aren't available, can't request a token from FlexiAPI"
-            )
-            return
-        }
-        
-        let pushConfig = core.pushNotificationConfig
-        if pushConfig != nil && self.accountManagerServices != nil {
-#if DEBUG
-                    let pushEnvironment = ".dev"
-#else
-                    let pushEnvironment = ""
-#endif
-            pushConfig!.provider = "apns\(pushEnvironment)"
-            var formatedPnParam = pushConfig!.param
-            formatedPnParam = formatedPnParam?.replacingOccurrences(of: "voip&remote", with: "voip")
-            pushConfig!.param = formatedPnParam
-            Log.info("formated pn param \(String(describing: formatedPnParam))")
-            
-            let voipToken = pushConfig!.voipToken
-            if voipToken != nil && self.accountManagerServices != nil {
-                pushConfig!.prid = voipToken
-                do {
-                    let request = try self.accountManagerServices!.createSendAccountCreationTokenByPushRequest(
-                        pnProvider: pushConfig?.provider ?? "",
-                        pnParam: pushConfig?.param ?? "",
-                        pnPrid: pushConfig?.prid ?? ""
-                    )
-                    Log.info("Submit push token request ")
-                    request.submit()
-                } catch {
-                    Log.error("\(RegisterViewModel.TAG) Can't create account creation token by push request")
-                    
-                }
-            } else {
-                Log.error("\(RegisterViewModel.TAG) No remote push voipToken available in core for account creator configuration")
-                
-            }
-            
-            Log.info("\(RegisterViewModel.TAG) Found push notification info: provider \("apns.dev"), param \(formatedPnParam ?? "error") and prid \(voipToken)")
-        } else {
-            Log.error("\(RegisterViewModel.TAG) No push configuration object in Core, shouldn't happen!")
-            
-        }
-    }
 }
 
 @main

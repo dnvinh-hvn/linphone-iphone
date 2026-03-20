@@ -349,9 +349,19 @@ class TelecomManager: ObservableObject {
 	}
 	
 	func displayIncomingCall(call: Call?, handle: String, hasVideo: Bool, callId: String, displayName: String) {
+		if DNDManager.shared.isCurrentlyActive {
+			Log.info("[TelecomManager] DND is active — declining incoming call \(callId)")
+			if let call = call {
+				CoreContext.shared.doOnCoreQueue { _ in
+					try? call.decline(reason: .DoNotDisturb)
+				}
+			}
+			return
+		}
+
 		let uuid = UUID()
 		let callInfo = CallInfo.newIncomingCallInfo(callId: callId)
-		
+
 		providerDelegate.callInfos.updateValue(callInfo, forKey: uuid)
 		providerDelegate.uuids.updateValue(uuid, forKey: callId)
 		providerDelegate.reportIncomingCall(call: call, uuid: uuid, handle: handle, hasVideo: hasVideo, displayName: displayName)

@@ -316,6 +316,16 @@
 "settings_advanced_video_codecs_title" = "Video-Codecs";
 "settings_calls_adaptive_rate_control_title" = "Adaptive Geschwindigkeitsregelung";
 "settings_calls_auto_record_title" = "Automatische Anrufaufzeichnung starten";
+
+// Do Not Disturb
+"settings_dnd_section_title" = "Bitte nicht stören";
+"settings_dnd_enable_now_title" = "Jetzt aktivieren";
+"settings_dnd_active_subtitle" = "BNS aktiv — eingehende Anrufe werden abgelehnt";
+"settings_dnd_schedule_title" = "BNS planen";
+"settings_dnd_schedule_start_title" = "Beginn";
+"settings_dnd_schedule_end_title" = "Ende";
+"settings_dnd_status_active" = "BNS ist jetzt aktiv";
+"settings_dnd_schedule_range" = "Stumm %1$@ – %2$@ täglich";
 "settings_calls_calibrate_echo_canceller_title" = "Echokompensator kalibrieren";
 "settings_calls_change_ringtone_title" = "Klingelton ändern";
 "settings_calls_echo_canceller_subtitle" = "Verhindert, dass das Echo am entfernten Ende gehört wird, wenn kein Hardware Echokompensator verfügbar ist";

@@ -270,6 +270,16 @@
 "settings_advanced_video_codecs_title" = "Video kodeky";
 "settings_calls_adaptive_rate_control_title" = "Adaptivní datový tok";
 "settings_calls_auto_record_title" = "Automaticky spouštět nahrávání hovorů";
+
+// Do Not Disturb
+"settings_dnd_section_title" = "Do Not Disturb";
+"settings_dnd_enable_now_title" = "Enable now";
+"settings_dnd_active_subtitle" = "DND is active — incoming calls are silenced";
+"settings_dnd_schedule_title" = "Schedule DND";
+"settings_dnd_schedule_start_title" = "Start";
+"settings_dnd_schedule_end_title" = "End";
+"settings_dnd_status_active" = "DND is active now";
+"settings_dnd_schedule_range" = "Silent %1$@ – %2$@ every day";
 "settings_calls_calibrate_echo_canceller_done_no_echo" = "žádné echo";
 "settings_calls_calibrate_echo_canceller_failed" = "selhalo";
 "settings_calls_calibrate_echo_canceller_in_progress" = "probíhá";
