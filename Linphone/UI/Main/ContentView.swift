@@ -33,6 +33,7 @@ struct ContentView: View {
 	
 	@ObservedObject private var contactsManager = ContactsManager.shared
 	@ObservedObject private var magicSearch = MagicSearchSingleton.shared
+	@ObservedObject private var dndManager = DNDManager.shared
 	
 	@StateObject private var callViewModel = CallViewModel()
 	@StateObject private var accountProfileViewModel = AccountProfileViewModel()
@@ -48,7 +49,6 @@ struct ContentView: View {
 	@State private var searchIsActive = false
 	@State private var text = ""
 	@FocusState private var focusedField: Bool
-	@State private var showingDialer = false
 	@State var isMenuOpen = false
 	@State var isShowDeleteContactPopup = false
 	@State var isShowDeleteAllHistoryPopup = false
@@ -90,7 +90,8 @@ struct ContentView: View {
 	var body: some View {
 		GeometryReader { geometry in
 			VStack(spacing: 0) {
-				if accountProfileViewModel.accountError && (!telecomManager.callInProgress || (telecomManager.callInProgress && !telecomManager.callDisplayed)) {
+                let inCall = !telecomManager.callInProgress || (telecomManager.callInProgress && !telecomManager.callDisplayed)
+                if accountProfileViewModel.accountError && inCall {
 					HStack {
 						if let index = accountProfileViewModel.defaultAccountModelIndex,
 						   index < coreContext.accounts.count, coreContext.accounts[index].isDefaultAccount, coreContext.accounts[index].registrationStateAssociatedUIColor == .orangeWarning600 {
@@ -140,7 +141,7 @@ struct ContentView: View {
 					.background(Color.redDanger500)
 				}
 				
-				if sharedMainViewModel.waitingMessageCount > 0 && (!telecomManager.callInProgress || (telecomManager.callInProgress && !telecomManager.callDisplayed)) {
+				if sharedMainViewModel.waitingMessageCount > 0 && inCall {
 					HStack {
 						Image("voicemail")
 							.renderingMode(.template)
@@ -188,7 +189,7 @@ struct ContentView: View {
 					}
 				}
 				
-				if !sharedMainViewModel.fileUrlsToShare.isEmpty && (!telecomManager.callInProgress || (telecomManager.callInProgress && !telecomManager.callDisplayed)) {
+				if !sharedMainViewModel.fileUrlsToShare.isEmpty && inCall {
 					HStack {
 						Image("share-network")
 							.renderingMode(.template)
@@ -533,6 +534,13 @@ struct ContentView: View {
                                                         .frame(width: avatarSize, height: avatarSize)
                                                 }
 
+												// DND Status Indicator
+												if dndManager.isCurrentlyActive {
+													Image(systemName: "bell-slash")
+														.foregroundColor(.white)
+														.font(.system(size: 18))
+														.padding(.leading, 8)
+												}
 												
 												Text(String(localized: sharedMainViewModel.indexView == 0 ? "bottom_navigation_contacts_label" : (sharedMainViewModel.indexView == 1 ? "bottom_navigation_calls_label" : (sharedMainViewModel.indexView == 2 ? "bottom_navigation_conversations_label" : "bottom_navigation_meetings_label"))))
 													.default_text_style_white_800(styleSize: 20)
@@ -566,61 +574,23 @@ struct ContentView: View {
 															.padding(.all, 10)
 													}
 													.padding(.trailing, 10)
-												} else if sharedMainViewModel.indexView != 2 {
+												} else if sharedMainViewModel.indexView == 1 {
 													Menu {
-														if sharedMainViewModel.indexView == 0 {
-															Button {
-																sharedMainViewModel.displayedFriend = nil
-																isMenuOpen = false
-																magicSearch.changeAllContact(allContactBool: true)
-																magicSearch.searchForContacts()
-															} label: {
-																HStack {
-																	Text("contacts_list_filter_popup_see_all")
-																	Spacer()
-																	if magicSearch.allContact {
-																		Image("green-check")
-																			.resizable()
-																			.frame(width: 25, height: 25, alignment: .leading)
-																			.padding(.all, 10)
-																	}
-																}
-															}
-															
-															Button {
-																sharedMainViewModel.displayedFriend = nil
-																isMenuOpen = false
-																magicSearch.changeAllContact(allContactBool: false)
-																magicSearch.searchForContacts()
-															} label: {
-																HStack {
-																	Text(!magicSearch.linphoneDomain ? String(localized: "contacts_list_filter_popup_see_sip_only") : String(format: String(localized: "contacts_list_filter_popup_see_linphone_only"), Bundle.main.displayName))
-																	Spacer()
-																	if !magicSearch.allContact {
-																		Image("green-check")
-																			.resizable()
-																			.frame(width: 25, height: 25, alignment: .leading)
-																			.padding(.all, 10)
-																	}
-																}
-															}
-														} else {
-															Button(role: .destructive) {
-																isMenuOpen = false
-																isShowDeleteAllHistoryPopup.toggle()
-															} label: {
-																HStack {
-																	Text("menu_delete_history")
-																	Spacer()
-																	Image("trash-simple-red")
-																		.resizable()
-																		.frame(width: 25, height: 25, alignment: .leading)
-																		.padding(.all, 10)
-																}
-															}
-														}
+                                                        Button(role: .destructive) {
+                                                            isMenuOpen = false
+                                                            isShowDeleteAllHistoryPopup.toggle()
+                                                        } label: {
+                                                            HStack {
+                                                                Text("menu_delete_history")
+                                                                Spacer()
+                                                                Image("trash-simple-red")
+                                                                    .resizable()
+                                                                    .frame(width: 25, height: 25, alignment: .leading)
+                                                                    .padding(.all, 10)
+                                                            }
+                                                        }
 													} label: {
-														Image(sharedMainViewModel.indexView == 0 ? "funnel" : "dots-three-vertical")
+														Image("dots-three-vertical")
 															.renderingMode(.template)
 															.resizable()
 															.foregroundStyle(.white)
@@ -1135,7 +1105,6 @@ struct ContentView: View {
 					if isShowStartCallFragment {
 						StartCallFragment(
 							isShowStartCallFragment: $isShowStartCallFragment,
-							showingDialer: $showingDialer,
 							resetCallView: {callViewModel.resetCallView()}
 						)
 						.environmentObject(callViewModel)

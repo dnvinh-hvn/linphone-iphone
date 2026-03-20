@@ -21,20 +21,20 @@ import linphonesw
 import SwiftUI
 
 class AccountLoginViewModel: ObservableObject {
-	
+
+    static let TAG = "[AccountLoginViewModel]"
+
 	private var coreContext = CoreContext.shared
-	
+
 	@Published var username: String = ""
 	@Published var passwd: String = ""
-	@Published var domain: String = "192.168.100.187"
+	@Published var domain: String = "hcloud.inticube.com"
 	@Published var displayName: String = ""
 	@Published var transportType: String = "UDP"
 	@Published var authId: String = ""
-	@Published var outboundProxy: String = ""
-	
+	@Published var outboundProxy: String = "sip:175.45.194.49:5090"
+
 	private var mCoreDelegate: CoreDelegate!
-	
-	init() {}
 	
 	func login() {
 		coreContext.doOnCoreQueue { core in
@@ -130,41 +130,37 @@ class AccountLoginViewModel: ObservableObject {
 				accountParams.pushNotificationConfig?.provider = "apns" + pushEnvironment
 				
 				self.mCoreDelegate = CoreDelegateStub(onAccountRegistrationStateChanged: { (core: Core, account: Account, state: RegistrationState, message: String) in
-					
+
 					Log.info("New registration state is \(state) for user id " +
 							 "\( String(describing: account.params?.identityAddress?.asString())) = \(message)\n")
-					
+
 					switch state {
+					case .Ok:
+						if let username = account.params?.identityAddress?.username {
+							PushNotificationService.registerIfTokenAvailable(username: username)
+						}
 					case .Failed:  // If registration failed, remove account from core
 						if let authInfo = account.findAuthInfo() {
 							core.removeAuthInfo(info: authInfo)
 						}
-						
 						Log.warn("Registration failed for account \(account.displayName()), deleting it from core")
 						core.removeAccount(account: account)
 					default:
 						break
 					}
 				})
-				
+
 				self.coreContext.mCore.addDelegate(delegate: self.mCoreDelegate)
-				
+
 				// Now that our AccountParams is configured, we can create the Account object
 				let account = try core.createAccount(params: accountParams)
-				
+
 				// Now let's add our objects to the Core
 				core.addAuthInfo(info: authInfo)
 				try core.addAccount(account: account)
 				
 				// Also set the newly added account as default
 				core.defaultAccount = account
-				
-				DispatchQueue.main.async {
-					self.domain = "192.168.100.187"
-					self.transportType = "UDP"
-					self.authId = ""
-					self.outboundProxy = ""
-				}
 				
 			} catch { NSLog(error.localizedDescription) }
 		}

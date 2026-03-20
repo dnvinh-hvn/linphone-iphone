@@ -92,7 +92,7 @@ struct ThirdPartySipAccountLoginFragment: View {
 		VStack {
 			ZStack {
 				
-				Text("HANSOL - SIPPHONE")
+				Text("SOFTPHONE")
 					.default_text_style_800(styleSize: 20)
 			}
 			.frame(width: geometry.size.width)
@@ -164,7 +164,7 @@ struct ThirdPartySipAccountLoginFragment: View {
 					.default_text_style_700(styleSize: 15)
 					.padding(.bottom, -5)
 				
-				TextField("192.168.100.187", text: $accountLoginViewModel.domain)
+				TextField("hcloud.inticube.com", text: $accountLoginViewModel.domain)
 					.default_text_style(styleSize: 15)
 					.disableAutocorrection(true)
 					.autocapitalization(.none)
@@ -180,25 +180,27 @@ struct ThirdPartySipAccountLoginFragment: View {
 					.padding(.bottom)
 					.focused($isDomainFocused)
 				
-				Text(String(localized: "sip_address_display_name"))
-					.default_text_style_700(styleSize: 15)
-					.padding(.bottom, -5)
-				
-				TextField("sip_address_display_name", text: $accountLoginViewModel.displayName)
-					.default_text_style(styleSize: 15)
-					.disableAutocorrection(true)
-					.autocapitalization(.none)
-					.frame(height: 25)
-					.padding(.horizontal, 20)
-					.padding(.vertical, 15)
-					.cornerRadius(60)
-					.overlay(
-						RoundedRectangle(cornerRadius: 60)
-							.inset(by: 0.5)
-							.stroke(isDisplayNameFocused ? Color.orangeMain500 : Color.gray200, lineWidth: 1)
-					)
-					.padding(.bottom)
-					.focused($isDisplayNameFocused)
+                VStack(alignment: .leading) {
+                    Text("account_settings_sip_proxy_url_title")
+                        .default_text_style_700(styleSize: 15)
+                        .padding(.bottom, -5)
+                    
+                    TextField("account_settings_sip_proxy_url_title", text: $accountLoginViewModel.outboundProxy)
+                        .id(2)
+                        .default_text_style(styleSize: 15)
+                        .frame(height: 25)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 15)
+                        .background(.white)
+                        .cornerRadius(60)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 60)
+                                .inset(by: 0.5)
+                                .stroke(isOutboundProxyFocused ? Color.orangeMain500 : Color.gray200, lineWidth: 1)
+                        )
+                        .focused($isOutboundProxyFocused)
+                }
+                .padding(.bottom)
             
 			}
 			.frame(maxWidth: SharedMainViewModel.shared.maxWidth)

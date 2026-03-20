@@ -24,10 +24,11 @@ import Combine
 class URIHandler {
 	
 	// Need to cover all Info.plist URL schemes.
-	private static let callSchemes = ["sip", "sip-linphone", "linphone-sip", "tel", "callto"]
-	private static let secureCallSchemes = ["sips", "sips-linphone", "linphone-sips"]
-	private static let configurationSchemes = ["linphone-config"]
-	private static let sharedExtensionSchemes = ["linphone-message"]
+	private static let callSchemes = ["sip", "sip-softphone", "softphone-sip", "tel", "callto"]
+	private static let secureCallSchemes = ["sips", "sips-softphone", "softphone-sips"]
+	private static let configurationSchemes = ["softphone-config"]
+	private static let sharedExtensionSchemes = ["softphone-message"]
+	private static let softphoneScheme = "softphone"
 
 	private static var uriHandlerCoreDelegate: CoreDelegateStub?
 	
@@ -66,6 +67,8 @@ class URIHandler {
 				initiateConfiguration(url: url)
 			} else if sharedExtensionSchemes.contains(scheme) {
 				processReceivedFiles(url: url)
+			} else if scheme == softphoneScheme {
+				initiateSoftphoneCall(url: url)
 			} else if scheme == SingleSignOnManager.shared.ssoRedirectUri.scheme {
 				continueSSO(url: url)
 			} else {
@@ -91,6 +94,32 @@ class URIHandler {
 		}
 	}
 	
+	// Handles softphone://call/<phoneNumber>
+	private static func initiateSoftphoneCall(url: URL) {
+		guard url.host == "call" else {
+			Log.error("[URIHandler] softphone URL unsupported action: \(url.host ?? "nil")")
+			toast("Failed_uri_handler_bad_call_address")
+			return
+		}
+		let phoneNumber = url.pathComponents.dropFirst().first ?? ""
+		guard !phoneNumber.isEmpty else {
+			Log.error("[URIHandler] softphone URL missing phone number: \(url)")
+			toast("Failed_uri_handler_bad_call_address")
+			return
+		}
+		CoreContext.shared.performActionOnCoreQueueWhenCoreIsStarted { core in
+			if let address = core.interpretUrl(url: phoneNumber,
+											   applyInternationalPrefix: LinphoneUtils.applyInternationalPrefix(core: core)) {
+				Log.info("[URIHandler] softphone initiating call to: \(address.asString())")
+				addCoreDelegate()
+				TelecomManager.shared.doCallWithCore(addr: address, isVideo: false, isConference: false)
+			} else {
+				Log.error("[URIHandler] softphone unable to interpret phone number: \(phoneNumber)")
+				toast("Failed_uri_handler_bad_call_address")
+			}
+		}
+	}
+
 	private static func initiateConfiguration(url: URL) {
 		if autoRemoteProvisioningOnConfigUriHandler() {
 			CoreContext.shared.doOnCoreQueue { core in

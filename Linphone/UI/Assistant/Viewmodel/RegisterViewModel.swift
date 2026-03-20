@@ -303,7 +303,7 @@ class RegisterViewModel: ObservableObject {
 #endif
 			pushConfig!.provider = "apns\(pushEnvironment)"
 			var formatedPnParam = pushConfig!.param
-			formatedPnParam = formatedPnParam?.replacingOccurrences(of: "voip&remote", with: "remote")
+			formatedPnParam = formatedPnParam?.replacingOccurrences(of: "voip&remote", with: "voip")
 			pushConfig!.param = formatedPnParam
 			
 			let coreRemoteToken = pushConfig!.remoteToken

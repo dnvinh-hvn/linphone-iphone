@@ -54,6 +54,6 @@ return_empty_friends=1
 imdn_to_everybody_threshold=1
 
 [ui]
-contacts_filter=sip.linphone.org
+contacts_filter=
 
 ## End of default rc

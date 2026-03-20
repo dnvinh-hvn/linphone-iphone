@@ -49,10 +49,11 @@ struct SideMenu: View {
 			VStack {
 				VStack {
 					HStack {
-						Image("hansol")
+						Image("handsol_inticube")
                             .renderingMode(.original)
 							.resizable()
-							.frame(width: 150, height: 32)
+                            .aspectRatio(contentMode: .fit)
+							.frame(width: 110, height: 45)
 							.padding(10)
 						Spacer()
 						Image("x")
@@ -113,16 +114,7 @@ struct SideMenu: View {
 								isShowRecordingsListFragment = true
 							}
 						}
-						
-						SideMenuEntry(
-							iconName: "question",
-							title: "help_title"
-						).onTapGesture {
-							self.menuClose()
-							withAnimation {
-								isShowHelpFragment = true
-							}
-						}
+
 					}
 					.padding(.bottom, safeAreaInsets.bottom + 13)
 					.padding(.top, 13)

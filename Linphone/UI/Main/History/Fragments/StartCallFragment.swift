@@ -33,7 +33,7 @@ struct StartCallFragment: View {
 	@StateObject private var startCallViewModel = StartCallViewModel()
 	
 	@Binding var isShowStartCallFragment: Bool
-	@Binding var showingDialer: Bool
+    @State private var showingDialer = true
 	
 	@FocusState var isSearchFieldFocused: Bool
 	@State private var delayedColor = Color.white
@@ -42,7 +42,7 @@ struct StartCallFragment: View {
 	
 	var body: some View {
 		NavigationView {
-			if #available(iOS 16.4, *), idiom != .pad {
+			if #available(iOS 16.4, *) {
 				startCall
 					.sheet(isPresented: $showingDialer) {
 						DialerBottomSheet(
@@ -449,7 +449,6 @@ struct StartCallFragment: View {
 #Preview {
 	StartCallFragment(
 		isShowStartCallFragment: .constant(true),
-		showingDialer: .constant(false),
 		resetCallView: {}
 	)
 }

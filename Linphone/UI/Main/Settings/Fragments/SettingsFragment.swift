@@ -21,11 +21,12 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct SettingsFragment: View {
-	
+
 	@StateObject private var settingsViewModel = SettingsViewModel()
-	
+	@ObservedObject private var dndManager = DNDManager.shared
+
 	@Binding var isShowSettingsFragment: Bool
-	
+
 	@State var securityIsOpen: Bool = false
 	@State var callsIsOpen: Bool = false
 	@State var conversationsIsOpen: Bool = false
@@ -33,7 +34,21 @@ struct SettingsFragment: View {
 	@State var meetingsIsOpen: Bool = false
 	@State var networkIsOpen: Bool = false
 	@State var userInterfaceIsOpen: Bool = false
-	
+
+	// Local date bindings for the time pickers
+	private var scheduleStartDate: Binding<Date> {
+		Binding(
+			get: { DNDManager.minutesToDate(dndManager.scheduleStartMinutes) },
+			set: { dndManager.scheduleStartMinutes = DNDManager.dateToMinutes($0) }
+		)
+	}
+	private var scheduleEndDate: Binding<Date> {
+		Binding(
+			get: { DNDManager.minutesToDate(dndManager.scheduleEndMinutes) },
+			set: { dndManager.scheduleEndMinutes = DNDManager.dateToMinutes($0) }
+		)
+	}
+
 	var body: some View {
 		NavigationView {
 			ZStack {
@@ -42,7 +57,7 @@ struct SettingsFragment: View {
 						.foregroundColor(Color.orangeMain500)
 						.edgesIgnoringSafeArea(.top)
 						.frame(height: 0)
-					
+
 					HStack {
 						Image("caret-left")
 							.renderingMode(.template)
@@ -60,13 +75,13 @@ struct SettingsFragment: View {
 									}
 								}
 							}
-						
+
 						Text("settings_title")
 							.default_text_style_orange_800(styleSize: 16)
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.padding(.top, 4)
 							.lineLimit(1)
-						
+
 						Spacer()
 					}
 					.frame(maxWidth: .infinity)
@@ -74,484 +89,108 @@ struct SettingsFragment: View {
 					.padding(.horizontal)
 					.padding(.bottom, 4)
 					.background(.white)
-					
+
 					ScrollView {
-						VStack(spacing: 0) {
-							// TODO: Wait for VFS fix
-							/*
-							HStack(alignment: .center) {
-								Text("settings_security_title")
-									.default_text_style_800(styleSize: 18)
-									.frame(maxWidth: .infinity, alignment: .leading)
-								
-								Spacer()
-								
-								Image(securityIsOpen ? "caret-up" : "caret-down")
-									.renderingMode(.template)
-									.resizable()
-									.foregroundStyle(Color.grayMain2c600)
-									.frame(width: 25, height: 25, alignment: .leading)
-									.padding(.all, 10)
-							}
-							.padding(.vertical, 10)
-							.padding(.horizontal, 20)
-							.background(Color.gray100)
-							.onTapGesture {
-								withAnimation {
-									securityIsOpen.toggle()
+						VStack(spacing: 12) {
+
+							// MARK: - General
+							VStack(spacing: 0) {
+								VStack(spacing: 30) {
+									Toggle("settings_calls_auto_record_title", isOn: $settingsViewModel.autoRecord)
+										.default_text_style_700(styleSize: 15)
 								}
+								.padding(.vertical, 30)
+								.padding(.horizontal, 20)
 							}
-							
-							if securityIsOpen {
-								VStack(spacing: 0) {
-									VStack(spacing: 30) {
-										HStack {
-											VStack(alignment: .leading, spacing: 2) {
-												Text("settings_security_enable_vfs_title")
-													.default_text_style_700(styleSize: 15)
-												Text("settings_security_enable_vfs_subtitle")
-													.foregroundColor(Color.grayMain2c500)
-													.default_text_style(styleSize: 14)
-											}
-											.layoutPriority(1)
-											
-											Toggle(isOn: $settingsViewModel.enableVfs) {
-												EmptyView()
-											}
-											.toggleStyle(SwitchToggleStyle())
-											.disabled(settingsViewModel.enableVfs)
-										}
-										
-										/*
-										Toggle("settings_security_prevent_screenshots_title", isOn: $isOn)
-											.default_text_style_700(styleSize: 15)
-										*/
-									}
-									.padding(.vertical, 30)
+							.background(.white)
+							.cornerRadius(15)
+
+							// MARK: - Do Not Disturb
+							VStack(alignment: .leading, spacing: 0) {
+
+								// Section header
+								Text("settings_dnd_section_title")
+									.default_text_style_orange_800(styleSize: 13)
 									.padding(.horizontal, 20)
-								}
-								.background(.white)
-								.cornerRadius(15)
-								.padding(.horizontal)
-								.zIndex(-1)
-								.transition(.move(edge: .top))
-							}
-							*/
-							
-							HStack(alignment: .center) {
-								Text("settings_calls_title")
-									.default_text_style_800(styleSize: 18)
-									.frame(maxWidth: .infinity, alignment: .leading)
-								
-								Spacer()
-								
-								Image(callsIsOpen ? "caret-up" : "caret-down")
-									.renderingMode(.template)
-									.resizable()
-									.foregroundStyle(Color.grayMain2c600)
-									.frame(width: 25, height: 25, alignment: .leading)
-									.padding(.all, 10)
-							}
-							.padding(.vertical, 10)
-							.padding(.horizontal, 20)
-							.background(Color.gray100)
-							.onTapGesture {
-								withAnimation {
-									callsIsOpen.toggle()
-								}
-							}
-							
-							if callsIsOpen {
+									.padding(.top, 16)
+									.padding(.bottom, 8)
+
 								VStack(spacing: 0) {
-									VStack(spacing: 30) {
-										Toggle("settings_calls_adaptive_rate_control_title", isOn: $settingsViewModel.adaptiveRateControl)
-											.default_text_style_700(styleSize: 15)
-										
-										Toggle("settings_calls_enable_video_title", isOn: $settingsViewModel.enableVideo)
-											.default_text_style_700(styleSize: 15)
-										
-										/*
-										Toggle("settings_calls_vibrate_while_ringing_title", isOn: $isOn)
-											.default_text_style_700(styleSize: 15)
-										*/
-										
-										Toggle("settings_calls_auto_record_title", isOn: $settingsViewModel.autoRecord)
-											.default_text_style_700(styleSize: 15)
-										
-										/*
-										Button {
-										} label: {
-											HStack {
-												Text("settings_calls_change_ringtone_title")
-													.default_text_style_700(styleSize: 15)
-													.frame(maxWidth: .infinity, alignment: .leading)
-												
-												Image("arrow-square-out")
-													.renderingMode(.template)
-													.resizable()
-													.foregroundStyle(Color.grayMain2c600)
-													.frame(width: 25, height: 25, alignment: .leading)
-													.padding(.trailing, 10)
-											}
-										}
-										*/
-									}
-									.padding(.vertical, 30)
-									.padding(.horizontal, 20)
-								}
-								.background(.white)
-								.cornerRadius(15)
-								.padding(.horizontal)
-								.zIndex(-2)
-								.transition(.move(edge: .top))
-							}
-							/*
-							HStack(alignment: .center) {
-								Text("settings_conversations_title")
-									.default_text_style_800(styleSize: 18)
-									.frame(maxWidth: .infinity, alignment: .leading)
-								
-								Spacer()
-								
-								Image(conversationsIsOpen ? "caret-up" : "caret-down")
-									.renderingMode(.template)
-									.resizable()
-									.foregroundStyle(Color.grayMain2c600)
-									.frame(width: 25, height: 25, alignment: .leading)
-									.padding(.all, 10)
-							}
-							.padding(.vertical, 10)
-							.padding(.horizontal, 20)
-							.background(Color.gray100)
-							.onTapGesture {
-								withAnimation {
-									conversationsIsOpen.toggle()
-								}
-							}
-							
-							if conversationsIsOpen {
-								VStack(spacing: 0) {
-									VStack(spacing: 30) {
-										Toggle("settings_conversations_auto_download_title", isOn: $settingsViewModel.autoDownload)
-											.default_text_style_700(styleSize: 15)
-									}
-									.padding(.vertical, 30)
-									.padding(.horizontal, 20)
-								}
-								.background(.white)
-								.cornerRadius(15)
-								.padding(.horizontal)
-								.zIndex(-3)
-								.transition(.move(edge: .top))
-							}*/
-							
-							HStack(alignment: .center) {
-								Text("settings_contacts_title")
-									.default_text_style_800(styleSize: 18)
-									.frame(maxWidth: .infinity, alignment: .leading)
-								
-								Spacer()
-								
-								Image(contactsIsOpen ? "caret-up" : "caret-down")
-									.renderingMode(.template)
-									.resizable()
-									.foregroundStyle(Color.grayMain2c600)
-									.frame(width: 25, height: 25, alignment: .leading)
-									.padding(.all, 10)
-							}
-							.padding(.vertical, 10)
-							.padding(.horizontal, 20)
-							.background(Color.gray100)
-							.onTapGesture {
-								withAnimation {
-									contactsIsOpen.toggle()
-								}
-							}
-							
-							if contactsIsOpen {
-								VStack(spacing: 0) {
-									VStack(spacing: 20) {
-										NavigationLink(destination: {
-											LdapServerConfigurationFragment()
-												.environmentObject(settingsViewModel)
-										}, label: {
-											HStack(alignment: .center) {
-												Text("settings_contacts_add_ldap_server_title")
-													.default_text_style_700(styleSize: 15)
-													.frame(maxWidth: .infinity, alignment: .leading)
-												
-												Spacer()
-												
-												Image("caret-right")
-													.renderingMode(.template)
-													.resizable()
-													.foregroundStyle(Color.grayMain2c600)
-													.frame(width: 20, height: 20, alignment: .leading)
-													.padding(.all, 10)
-											}
-											.frame(maxWidth: .infinity)
-										})
-										
-										if !settingsViewModel.ldapServers.isEmpty {
-											ForEach(settingsViewModel.ldapServers, id: \.self) { ldap in
-												NavigationLink(destination: {
-													LdapServerConfigurationFragment(url: ldap)
-														.environmentObject(settingsViewModel)
-												}, label: {
-													HStack(alignment: .center) {
-														Text(ldap)
-															.default_text_style_700(styleSize: 15)
-															.frame(maxWidth: .infinity, alignment: .leading)
-														
-														Spacer()
-														
-														Image("pencil-simple")
-															.renderingMode(.template)
-															.resizable()
-															.foregroundStyle(Color.grayMain2c600)
-															.frame(width: 20, height: 20, alignment: .leading)
-															.padding(.all, 10)
-													}
-													.padding(.horizontal, 10)
-													.frame(maxWidth: .infinity)
-												})
-											}
-										}
-										
-										NavigationLink(destination: {
-											CardDavAddressBookConfigurationFragment()
-												.environmentObject(settingsViewModel)
-										}, label: {
-											HStack(alignment: .center) {
-												Text("settings_contacts_add_carddav_server_title")
-													.default_text_style_700(styleSize: 15)
-													.frame(maxWidth: .infinity, alignment: .leading)
-												
-												Spacer()
-												
-												Image("caret-right")
-													.renderingMode(.template)
-													.resizable()
-													.foregroundStyle(Color.grayMain2c600)
-													.frame(width: 20, height: 20, alignment: .leading)
-													.padding(.all, 10)
-											}
-											.frame(maxWidth: .infinity)
-										})
-										
-										if !settingsViewModel.cardDavFriendsLists.isEmpty {
-											ForEach(settingsViewModel.cardDavFriendsLists, id: \.self) { cardDavName in
-												NavigationLink(destination: {
-													CardDavAddressBookConfigurationFragment(name: cardDavName)
-												  .environmentObject(settingsViewModel)
-												}, label: {
-													HStack(alignment: .center) {
-														Text(cardDavName)
-															.default_text_style_700(styleSize: 15)
-															.frame(maxWidth: .infinity, alignment: .leading)
-														
-														Spacer()
-														
-														Image("pencil-simple")
-															.renderingMode(.template)
-															.resizable()
-															.foregroundStyle(Color.grayMain2c600)
-															.frame(width: 20, height: 20, alignment: .leading)
-															.padding(.all, 10)
-													}
-													.padding(.horizontal, 10)
-													.frame(maxWidth: .infinity)
-												})
-											}
-										}
-									}
-									.padding(.vertical, 30)
-									.padding(.horizontal, 20)
-								}
-								.background(.white)
-								.cornerRadius(15)
-								.padding(.horizontal)
-								.zIndex(-4)
-								.transition(.move(edge: .top))
-							}
-							
-							HStack(alignment: .center) {
-								Text("settings_meetings_title")
-									.default_text_style_800(styleSize: 18)
-									.frame(maxWidth: .infinity, alignment: .leading)
-								
-								Spacer()
-								
-								Image(meetingsIsOpen ? "caret-up" : "caret-down")
-									.renderingMode(.template)
-									.resizable()
-									.foregroundStyle(Color.grayMain2c600)
-									.frame(width: 25, height: 25, alignment: .leading)
-									.padding(.all, 10)
-							}
-							.padding(.vertical, 10)
-							.padding(.horizontal, 20)
-							.background(Color.gray100)
-							.onTapGesture {
-								withAnimation {
-									meetingsIsOpen.toggle()
-								}
-							}
-							
-							if meetingsIsOpen {
-								VStack(spacing: 0) {
-									VStack(spacing: 30) {
-										VStack(alignment: .leading) {
-											Text("settings_meetings_default_layout_title")
+
+									// --- Manual toggle ---
+									Toggle(isOn: $dndManager.isManuallyEnabled) {
+										VStack(alignment: .leading, spacing: 2) {
+											Text("settings_dnd_enable_now_title")
 												.default_text_style_700(styleSize: 15)
-												.padding(.bottom, -5)
-											
-											Menu {
-												Button("settings_meetings_layout_active_speaker_label") { settingsViewModel.defaultLayout = String(localized: "settings_meetings_layout_active_speaker_label") }
-												Button("settings_meetings_layout_mosaic_label") { settingsViewModel.defaultLayout = String(localized: "settings_meetings_layout_mosaic_label") }
-											} label: {
-												Text(settingsViewModel.defaultLayout)
-													.default_text_style(styleSize: 15)
-													.frame(maxWidth: .infinity, alignment: .leading)
-												Image("caret-down")
-													.renderingMode(.template)
-													.resizable()
-													.foregroundStyle(Color.grayMain2c500)
-													.frame(width: 20, height: 20)
+											if dndManager.isManuallyEnabled {
+												Text("settings_dnd_active_subtitle")
+													.default_text_style(styleSize: 12)
+													.foregroundColor(Color.orangeMain500)
 											}
-											.frame(height: 25)
-											.padding(.horizontal, 20)
-											.padding(.vertical, 15)
-											.cornerRadius(60)
-											.overlay(
-												RoundedRectangle(cornerRadius: 60)
-													.inset(by: 0.5)
-													.stroke(Color.gray200, lineWidth: 1)
-											)
 										}
 									}
-									.padding(.vertical, 30)
 									.padding(.horizontal, 20)
-								}
-								.background(.white)
-								.cornerRadius(15)
-								.padding(.horizontal)
-								.zIndex(-5)
-								.transition(.move(edge: .top))
-							}
-							
-                            /*
-							HStack(alignment: .center) {
-								Text("settings_network_title")
-									.default_text_style_800(styleSize: 18)
-									.frame(maxWidth: .infinity, alignment: .leading)
-								
-								Spacer()
-								
-								Image(networkIsOpen ? "caret-up" : "caret-down")
-									.renderingMode(.template)
-									.resizable()
-									.foregroundStyle(Color.grayMain2c600)
-									.frame(width: 25, height: 25, alignment: .leading)
-									.padding(.all, 10)
-							}
-							.padding(.vertical, 10)
-							.padding(.horizontal, 20)
-							.background(Color.gray100)
-							.onTapGesture {
-								withAnimation {
-									networkIsOpen.toggle()
-								}
-							}
-							
-							if networkIsOpen {
-								VStack(spacing: 0) {
-									VStack(spacing: 30) {
-										Toggle("settings_network_use_wifi_only", isOn: $settingsViewModel.useWifiOnly)
-											.default_text_style_700(styleSize: 15)
-										
-										Toggle("settings_network_allow_ipv6", isOn: $settingsViewModel.allowIpv6)
-											.default_text_style_700(styleSize: 15)
+									.padding(.vertical, 16)
+
+									Divider().padding(.leading, 20)
+
+									// --- Schedule toggle ---
+									Toggle("settings_dnd_schedule_title", isOn: $dndManager.isScheduleEnabled)
+                                        .disabled(dndManager.isManuallyEnabled)
+										.default_text_style_700(styleSize: 15)
+										.padding(.horizontal, 20)
+										.padding(.vertical, 16)
+
+									// --- Time pickers (visible when schedule is on) ---
+									if dndManager.isScheduleEnabled && !dndManager.isManuallyEnabled {
+										Divider().padding(.leading, 20)
+
+										HStack {
+											Text("settings_dnd_schedule_start_title")
+												.default_text_style_700(styleSize: 15)
+											Spacer()
+											DatePicker("", selection: scheduleStartDate, displayedComponents: .hourAndMinute)
+												.labelsHidden()
+										}
+										.padding(.horizontal, 20)
+										.padding(.vertical, 12)
+
+										Divider().padding(.leading, 20)
+
+										HStack {
+											Text("settings_dnd_schedule_end_title")
+												.default_text_style_700(styleSize: 15)
+											Spacer()
+											DatePicker("", selection: scheduleEndDate, displayedComponents: .hourAndMinute)
+												.labelsHidden()
+										}
+										.padding(.horizontal, 20)
+										.padding(.vertical, 12)
+
+										Divider().padding(.leading, 20)
+
+										// Status hint
+										HStack(spacing: 6) {
+											Image(systemName: dndManager.isCurrentlyActive ? "moon.fill" : "moon")
+												.foregroundColor(dndManager.isCurrentlyActive ? Color.orangeMain500 : .gray)
+											Text(dndManager.isCurrentlyActive
+												 ? String(localized: "settings_dnd_status_active")
+												 : scheduleRangeLabel)
+												.default_text_style(styleSize: 12)
+												.foregroundColor(dndManager.isCurrentlyActive ? Color.orangeMain500 : .gray)
+										}
+										.padding(.horizontal, 20)
+										.padding(.vertical, 10)
 									}
-									.padding(.vertical, 30)
-									.padding(.horizontal, 20)
 								}
 								.background(.white)
 								.cornerRadius(15)
-								.padding(.horizontal)
-								.zIndex(-6)
-								.transition(.move(edge: .top))
+								.padding(.bottom, 4)
 							}
-							*/
-							/*
-							// Hide User interface (Dark mode)
-							
-							HStack(alignment: .center) {
-								Text("manage_account_details_title")
-									.default_text_style_800(styleSize: 18)
-									.frame(maxWidth: .infinity, alignment: .leading)
-								
-								Spacer()
-								
-								Image(userInterfaceIsOpen ? "caret-up" : "caret-down")
-									.renderingMode(.template)
-									.resizable()
-									.foregroundStyle(Color.grayMain2c600)
-									.frame(width: 25, height: 25, alignment: .leading)
-									.padding(.all, 10)
-							}
-							.padding(.vertical, 10)
-							.padding(.horizontal, 20)
-							.background(Color.gray100)
-							.onTapGesture {
-								withAnimation {
-									userInterfaceIsOpen.toggle()
-								}
-							}
-							
-							if userInterfaceIsOpen {
-								VStack(spacing: 0) {
-									VStack(spacing: 30) {
-										Toggle("account_settings_avpf_title", isOn: $isOn)
-											.default_text_style_700(styleSize: 15)
-										
-										Toggle("account_settings_avpf_title", isOn: $isOn)
-											.default_text_style_700(styleSize: 15)
-									}
-									.padding(.vertical, 30)
-									.padding(.horizontal, 20)
-								}
-								.background(.white)
-								.cornerRadius(15)
-								.padding(.horizontal)
-								.zIndex(-7)
-								.transition(.move(edge: .top))
-							}
-							*/
-							/*NavigationLink(destination: {
-								SettingsAdvancedFragment(settingsViewModel: settingsViewModel)
-							}, label: {
-								HStack(alignment: .center) {
-									Text("settings_advanced_title")
-										.default_text_style_800(styleSize: 18)
-										.frame(maxWidth: .infinity, alignment: .leading)
-									
-									Spacer()
-									
-									Image("caret-right")
-										.renderingMode(.template)
-										.resizable()
-										.foregroundStyle(Color.grayMain2c600)
-										.frame(width: 25, height: 25, alignment: .leading)
-										.padding(.all, 10)
-								}
-								.frame(maxWidth: .infinity)
-								
-							})
-							.padding(.vertical, 10)
-							.padding(.horizontal, 20)
-							.background(Color.gray100)*/
 						}
+						.padding(.horizontal, 12)
+						.padding(.vertical, 12)
+						.background(Color.gray100)
 					}
 					.background(Color.gray100)
 				}
@@ -561,5 +200,14 @@ struct SettingsFragment: View {
 			.navigationBarHidden(true)
 		}
 		.navigationViewStyle(StackNavigationViewStyle())
+	}
+
+	private var scheduleRangeLabel: String {
+		let fmt = DateFormatter()
+		fmt.timeStyle = .short
+		fmt.dateStyle = .none
+		let start = fmt.string(from: DNDManager.minutesToDate(dndManager.scheduleStartMinutes))
+		let end   = fmt.string(from: DNDManager.minutesToDate(dndManager.scheduleEndMinutes))
+		return String(format: NSLocalizedString("settings_dnd_schedule_range", comment: ""), start, end)
 	}
 }

@@ -18,7 +18,6 @@
  */
 
 import SwiftUI
-import Contacts
 import ContactsUI
 import linphonesw
 
@@ -181,21 +180,29 @@ struct ContactInnerFragment: View {
 										}
 									})
                                     
-                                    if !CorePreferences.disableChatFeature {
+                                    if hantalkAppIsInstalled() {
                                         Spacer()
                                         
                                         Button(action: {
 											CoreContext.shared.doOnCoreQueue { core in
 												if contactAvatarModel.addresses.count == 1 {
 													do {
-														let address = try Factory.Instance.createAddress(addr: contactAvatarModel.address)
-														contactsListViewModel.createOneToOneChatRoomWith(remote: address)
+                                                        let address = try Factory.Instance.createAddress(addr: contactAvatarModel.address)
+                                                        if let username = address.username, let url = URL(string: "hantalk_scheme://hantalk_host?chatId=\(username)") {
+															try UIApplication.shared.open(url)
+														}
 													} catch {
-														Log.error("[ContactInnerFragment] unable to create address for a new outgoing call : \(contactAvatarModel.address) \(error) ")
+														Log.error("[ContactInnerFragment] unable to create address for hantalk message : \(contactAvatarModel.address) \(error) ")
 													}
 												} else if contactAvatarModel.addresses.count < 1 && contactAvatarModel.phoneNumbersWithLabel.count == 1 {
-													if let firstPhoneNumbersWithLabel = contactAvatarModel.phoneNumbersWithLabel.first, let address = core.interpretUrl(url: firstPhoneNumbersWithLabel.phoneNumber, applyInternationalPrefix: LinphoneUtils.applyInternationalPrefix(core: core)) {
-														contactsListViewModel.createOneToOneChatRoomWith(remote: address)
+													do {
+                                                        if let firstPhoneNumbersWithLabel = contactAvatarModel.phoneNumbersWithLabel.first, let address = core.interpretUrl(url: firstPhoneNumbersWithLabel.phoneNumber, applyInternationalPrefix: LinphoneUtils.applyInternationalPrefix(core: core)), let username = address.username {
+                                                            if let url = URL(string: "hantalk_scheme://hantalk_host?chatId=\( username)") {
+																try UIApplication.shared.open(url)
+															}
+														}
+													} catch {
+														Log.error("[ContactInnerFragment] unable to create address for hantalk message : \(contactAvatarModel.address) \(error) ")
 													}
 												} else {
 													DispatchQueue.main.async {
@@ -303,19 +310,27 @@ struct ContactInnerFragment: View {
 		}
 		.navigationViewStyle(.stack)
 	}
+
+	func hantalkAppIsInstalled() -> Bool {
+		if let url = URL(string: "hantalk_scheme://hantalk_host") {
+			return UIApplication.shared.canOpenURL(url)
+		}
+		return false
+	}
 	
 	func editNativeContact() {
 		do {
-			let store = CNContactStore()
-			let descriptor = CNContactViewController.descriptorForRequiredKeys()
-			cnContact = try store.unifiedContact(
-				withIdentifier: contactAvatarModel.nativeUri,
-				keysToFetch: [descriptor]
-			)
-			
-			if cnContact != nil {
-				presentingEditContact.toggle()
-			}
+            //Disable native contact
+//			let store = CNContactStore()
+//			let descriptor = CNContactViewController.descriptorForRequiredKeys()
+//			cnContact = try store.unifiedContact(
+//				withIdentifier: contactAvatarModel.nativeUri,
+//				keysToFetch: [descriptor]
+//			)
+//			
+//			if cnContact != nil {
+//				presentingEditContact.toggle()
+//			}
 		} catch {
 			print(error)
 		}

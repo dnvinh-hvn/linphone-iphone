@@ -294,13 +294,13 @@
 "generic_address_picker_suggestions_list_title" = "Suggestions";
 "help_about_advanced_title" = "Avancé";
 "help_about_check_for_update" = "Vérifier les mises à jour";
-"help_about_contribute_translations_title" = "Aider à traduire Linphone";
+"help_about_contribute_translations_title" = "Aider à traduire SoftPhone";
 "help_about_open_source_licenses_subtitle" = "© Belledonne Communications 2010-2024";
 "help_about_open_source_licenses_title" = "GNU General Public License v3.0";
 "help_about_privacy_policy_subtitle" = "Quelles informations Linphone collecte et utilise";
 "help_about_privacy_policy_title" = "Politique de confidentialité";
-"help_about_title" = "À propos de Linphone";
-"help_about_user_guide_title" = "Guide utilisateur Linphone";
+"help_about_title" = "À propos de SoftPhone";
+"help_about_user_guide_title" = "Guide utilisateur SoftPhone";
 "help_about_user_guide_subtitle" = "Apprenez à maîtriser toutes les fonctionnalités de l'application, pas à pas.";
 "help_about_version_title" = "Version";
 "help_dialog_update_available_message" = "Une nouvelle version %@ est disponible. Voulez-vous mettre à jour ?";
@@ -457,6 +457,16 @@
 "settings_advanced_video_codecs_title" = "Codecs vidéo";
 "settings_calls_adaptive_rate_control_title" = "Contrôle automatique de la qualité";
 "settings_calls_auto_record_title" = "Enregistrement automatique des appels";
+
+// Do Not Disturb
+"settings_dnd_section_title" = "Ne pas déranger";
+"settings_dnd_enable_now_title" = "Activer maintenant";
+"settings_dnd_active_subtitle" = "Mode silencieux actif — les appels entrants sont ignorés";
+"settings_dnd_schedule_title" = "Planifier le mode silencieux";
+"settings_dnd_schedule_start_title" = "Début";
+"settings_dnd_schedule_end_title" = "Fin";
+"settings_dnd_status_active" = "Mode silencieux actif";
+"settings_dnd_schedule_range" = "Silencieux de %1$@ à %2$@ chaque jour";
 "settings_calls_calibrate_echo_canceller_done" = "%@ ms";
 "settings_calls_calibrate_echo_canceller_done_no_echo" = "pas d'écho";
 "settings_calls_calibrate_echo_canceller_failed" = "échec";

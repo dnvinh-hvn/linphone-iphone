@@ -218,6 +218,16 @@
 "settings_advanced_video_codecs_title" = "Відеокодеки";
 "settings_calls_adaptive_rate_control_title" = "Адаптивне керування швидкістю";
 "settings_calls_auto_record_title" = "Автоматично починати запис дзвінків";
+
+// Do Not Disturb
+"settings_dnd_section_title" = "Do Not Disturb";
+"settings_dnd_enable_now_title" = "Enable now";
+"settings_dnd_active_subtitle" = "DND is active — incoming calls are silenced";
+"settings_dnd_schedule_title" = "Schedule DND";
+"settings_dnd_schedule_start_title" = "Start";
+"settings_dnd_schedule_end_title" = "End";
+"settings_dnd_status_active" = "DND is active now";
+"settings_dnd_schedule_range" = "Silent %1$@ – %2$@ every day";
 "settings_calls_calibrate_echo_canceller_done_no_echo" = "луна відсутня";
 "settings_calls_calibrate_echo_canceller_failed" = "Калібрування не вдалося";
 "settings_calls_calibrate_echo_canceller_in_progress" = "виконується";
@@ -407,7 +417,7 @@
 "call_dialog_zrtp_validate_trust_message" = "Для вашої безпеки нам потрібно автентифікувати пристрій вашого співрозмовника. Будь ласка, обміняйтеся кодами:";
 "account_settings_cpim_in_basic_conversations_title" = "Використовуйте CPIM у «базових» розмовах";
 "account_settings_mwi_uri_title" = "URI сервера MWI (індикатор очікування повідомлення)";
-"help_about_title" = "Про Linphone";
+"help_about_title" = "Про SoftPhone";
 "settings_calls_calibrate_echo_canceller_done" = "%@ мс";
 "welcome_page_1_message" = "**Захищений**, **з відкритим вихідним кодом** та **французький** застосунок для спілкування.";
 "help_dialog_update_available_message" = "Доступна нова версія %@. Бажаєте оновити?";
@@ -440,7 +450,7 @@
 "conversation_reply_to_message_title" = "Відповісти на: ";
 "debug_logs_copied_to_clipboard_toast" = "Логи налагодження скопійовано в буфер обміну";
 "Default" = "За замовчуванням";
-"help_about_contribute_translations_title" = "Зробіть свій внесок у переклад Linphone";
+"help_about_contribute_translations_title" = "Зробіть свій внесок у переклад SoftPhone";
 "manage_account_dialog_international_prefix_help_message" = "Оберіть свою країну, щоб Linphone міг зіставляти ваші контакти.";
 "meeting_call_remove_no_participants" = "Наразі учасники відсутні…";
 "meeting_call_remove_participant_confirmation_message" = "Ви впевнені що хочете видалити %@ ?";
@@ -505,7 +515,7 @@
 "GC_MSG" = "Вас додали до чату";
 "help_about_open_source_licenses_subtitle" = "© Belledonne Communications 2010-2024";
 "help_about_open_source_licenses_title" = "GNU General Public License v3.0";
-"help_about_privacy_policy_subtitle" = "Яку інформацію збирає та використовує Linphone";
+"help_about_privacy_policy_subtitle" = "Яку інформацію збирає та використовує SoftPhone";
 "history_list_empty_with_filter_history" = "Немає записів, що відповідають вашому пошуку";
 "history_title" = "Історія дзвінків";
 "IM_MSG" = "Ви отримали повідомлення";

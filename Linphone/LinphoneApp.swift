@@ -20,11 +20,57 @@
 import SwiftUI
 import linphonesw
 import UserNotifications
+import CallKit
+import PushKit
+import Firebase
 
 let accountTokenNotification = Notification.Name("AccountCreationTokenReceived")
 var displayedChatroomPeerAddr: String?
 
-class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, PKPushRegistryDelegate {
+    func pushRegistry(_ registry: PKPushRegistry, didUpdate credentials: PKPushCredentials, for type: PKPushType) {
+        let deviceToken = credentials.token.map { String(format: "%02x", $0) }.joined()
+        Log.info("CallKit token: \(deviceToken)")
+        if let coreContext = coreContext {
+            coreContext.doOnCoreQueue { core in
+                core.pushNotificationConfig?.voipToken = deviceToken
+                if let username = core.defaultAccount?.params?.identityAddress?.username {
+                    PushNotificationService.updateVoipToken(deviceToken, username: username)
+                }
+            }
+        } else {
+            PushNotificationService.updateVoipToken(deviceToken, username: nil)
+        }
+    }
+    
+    func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
+        print("didInvalidatePushTokenFor")
+    }
+    
+    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
+        print("didReceiveIncomingPushWith")
+        guard type == .voIP else { return }
+        
+        var pushData = payload.dictionaryPayload["data"] as? [AnyHashable : Any]
+        print("\(payload.dictionaryPayload)")
+        print("\(pushData ?? [:])")
+        print("address: \(pushData?["addr"])")
+        print("name: \(pushData?["displayName"])")
+        
+//        do {
+//            let address = try Factory.Instance.createAddress(addr: "5889@hcloud.inticube.com")
+//            try address.setDisplayname(newValue: "Incoming call Display name")
+//            TelecomManager.shared.doCallWithCore(addr: address, isVideo: false, isConference: false)
+//        } catch {
+//            print("cannot create incomming call with core")
+//        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            completion()
+        }
+        
+    }
+    
 	
 	var launchNotificationCallId: String?
 	var launchNotificationPeerAddr: String?
@@ -32,14 +78,17 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 	
 	var coreContext: CoreContext?
  	var navigationManager: NavigationManager?
+    
 	
 	func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
 		let tokenStr = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
 		Log.info("Received remote push token : \(tokenStr)")
 		if let coreContext = coreContext {
 			coreContext.doOnCoreQueue { core in
-				Log.info("Forwarding remote push token to core")
-				core.didRegisterForRemotePushWithStringifiedToken(deviceTokenStr: tokenStr + ":remote")
+                core.pushNotificationConfig?.remoteToken = tokenStr
+				if let username = core.defaultAccount?.params?.identityAddress?.username {
+                    PushNotificationService.updateDeviceToken(tokenStr, username: username)
+                }
 			}
 		}
 	}
@@ -61,6 +110,23 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// Set up notifications
 		UNUserNotificationCenter.current().delegate = self
+        
+        //Setup VOIP
+        let mainQueue = DispatchQueue.main
+        let voipRegistry: PKPushRegistry = PKPushRegistry(queue: mainQueue)
+        voipRegistry.delegate = self
+        voipRegistry.desiredPushTypes = [PKPushType.voIP]
+        let token = voipRegistry.pushToken(for: .voIP)
+        print("CallKit current token \(String(describing: token))")
+        if let coreContext = coreContext, let token = token {
+            let tokenStr = token.map { String(format: "%02x", $0) }.joined()
+            coreContext.doOnCoreQueue { core in
+                core.pushNotificationConfig?.voipToken = tokenStr
+                if let username = core.defaultAccount?.params?.identityAddress?.username {
+                    PushNotificationService.updateVoipToken(tokenStr, username: username)
+                }
+            }
+        }
 		
 		return true
 	}
@@ -181,7 +247,7 @@ struct RootView: View {
 			if coreContext.coreHasStartedOnce {
 				if showWelcome {
 					ZStack {
-						WelcomeView()
+                        PermissionsFragment()
 						ToastView().zIndex(3)
 					}
 					.onAppear {

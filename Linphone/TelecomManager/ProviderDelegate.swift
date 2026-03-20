@@ -100,7 +100,7 @@ class ProviderDelegate: NSObject {
 		 Log.directLog(BCTBX_LOG_MESSAGE, text: "CallKit: declining call, as max calls (\(maxCalls)) reached  call-id: [\(String(describing: callId))] and UUID: [\(uuid.description)]")
 		 decline(uuid: uuid)
 		 
-		 CoreContext.shared.doOnCoreQueue(synchronous: true) { core in
+		 CoreContext.shared.doOnCoreQueue(synchronous: true) { core in9
 		 try? call?.decline(reason: .Busy)
 		 }
 		 return
