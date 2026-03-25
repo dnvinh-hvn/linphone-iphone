@@ -32,7 +32,19 @@ class CallAppData: NSObject {
 	var batteryWarningShown = false
 	var videoRequested = false /*set when user has requested for video*/
 	var isConference = false
-	
+}
+
+class CallIncomingData {
+    var callId: String = ""
+    var fromUri: String = ""
+    var uuid: String = ""
+    var displayName: String = ""
+    init(callId: String, fromUri: String, uuid: String, displayName: String) {
+        self.callId = callId
+        self.fromUri = fromUri
+        self.uuid = uuid
+        self.displayName = displayName
+    }
 }
 
 class TelecomManager: ObservableObject {
@@ -70,6 +82,8 @@ class TelecomManager: ObservableObject {
 	var referedFromCall: String?
 	var referedToCall: String?
 	var actionsToPerformOnceWhenCoreIsOn: [(() -> Void)] = []
+    
+    var waitingDisplayIncomingCall: CallIncomingData? = nil
 	
 	private init() {
 		providerDelegate = ProviderDelegate()
@@ -348,7 +362,8 @@ class TelecomManager: ObservableObject {
 		}
 	}
 	
-	func displayIncomingCall(call: Call?, handle: String, hasVideo: Bool, callId: String, displayName: String) {
+    func displayIncomingCall(call: Call?, handle: String, hasVideo: Bool, callId: String, displayName: String, callUUID: UUID? = nil) {
+        Log.info("display incoming call \(callId)")
 		if DNDManager.shared.isCurrentlyActive {
 			Log.info("[TelecomManager] DND is active — declining incoming call \(callId)")
 			if let call = call {
@@ -359,7 +374,7 @@ class TelecomManager: ObservableObject {
 			return
 		}
 
-		let uuid = UUID()
+        let uuid = callUUID ?? UUID()
 		let callInfo = CallInfo.newIncomingCallInfo(callId: callId)
 
 		providerDelegate.callInfos.updateValue(callInfo, forKey: uuid)
@@ -469,7 +484,9 @@ class TelecomManager: ObservableObject {
 		
 		if cstate == .PushIncomingReceived {
 			Log.info("PushIncomingReceived in core delegate, display callkit call")
-			TelecomManager.shared.displayIncomingCall(call: call, handle: "Calling", hasVideo: false, callId: callId, displayName: "Calling")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                TelecomManager.shared.displayIncomingCall(call: call, handle: self.waitingDisplayIncomingCall?.displayName ?? "Calling", hasVideo: false, callId: callId, displayName: self.waitingDisplayIncomingCall?.displayName ?? "Calling")
+            }
 		} else {
 			// let oldRemoteConfVideo = self.remoteConfVideo
 			
@@ -563,8 +580,8 @@ class TelecomManager: ObservableObject {
 			switch cstate {
 			case .IncomingReceived:
 				let addr = call.remoteAddress
-				incomingDisplayName(call: call) { displayNameResult in
-					let displayName = displayNameResult
+//				incomingDisplayName(call: call) { displayNameResult in
+//					let displayName = displayNameResult
 	#if targetEnvironment(simulator)
 					DispatchQueue.main.async {
 						self.outgoingCallStarted = false
@@ -578,19 +595,19 @@ class TelecomManager: ObservableObject {
 					}
 	#endif
 					if TelecomManager.callKitEnabled(core: core) {
-						let uuid = self.providerDelegate.uuids["\(callId)"]
-						TelecomManager.uuidReplacedCall = callId
+//						let uuid = self.providerDelegate.uuids["\(callId)"]
+//						TelecomManager.uuidReplacedCall = callId
 						
-						if uuid != nil {
+//						if uuid != nil {
 							// Tha app is now registered, updated the call already existed.
-							self.providerDelegate.updateCall(uuid: uuid!, handle: addr!.asStringUriOnly(), hasVideo: self.remoteConfVideo, displayName: displayName)
-						} else {
-							let videoEnabled = call.remoteParams?.videoEnabled ?? false
-							let isConference = call.callLog?.wasConference() ?? false
-							let videoDir = call.remoteParams?.videoDirection != MediaDirection.Inactive
-							self.displayIncomingCall(call: call, handle: addr!.asStringUriOnly(), hasVideo: videoEnabled && videoDir && !isConference, callId: callId, displayName: displayName)
-						}
-					}
+//							self.providerDelegate.updateCall(uuid: uuid!, handle: addr!.asStringUriOnly(), hasVideo: self.remoteConfVideo, displayName: displayName)
+//						} else {
+//							let videoEnabled = call.remoteParams?.videoEnabled ?? false
+//							let isConference = call.callLog?.wasConference() ?? false
+//							let videoDir = call.remoteParams?.videoDirection != MediaDirection.Inactive
+//							self.displayIncomingCall(call: call, handle: addr!.asStringUriOnly(), hasVideo: videoEnabled && videoDir && !isConference, callId: callId, displayName: displayName)
+//						}
+//					}
 				}
 			case .StreamsRunning:
 				if TelecomManager.callKitEnabled(core: core) {

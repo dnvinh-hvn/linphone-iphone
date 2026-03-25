@@ -147,6 +147,7 @@ class CoreContext: ObservableObject {
 			
 			self.mCore.callkitEnabled = true
 			self.mCore.pushNotificationEnabled = true
+            self.mCore.ipv6Enabled = false
 			
 			let appGitVersion = AppGitInfo.commit
 			let appGitBranch = AppGitInfo.branch
@@ -268,6 +269,39 @@ class CoreContext: ObservableObject {
 				
 			}, onPushNotificationReceived: {(core: Core, payload: String) in
                 Log.info("[CoreContext]onPushNotificationReceived payload: \(payload)")
+                if let jsonData = payload.data(using: .utf8) {
+                    do {
+                        if let dictionary = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] {
+                            let aps = dictionary["aps"] as? [String: Any]
+                            let apsCallId = aps?["call-id"] as? String
+                            if let callId = apsCallId ?? (dictionary["call-id"] as? String), let displayName = dictionary["display-name"] as? String, let fromUri = dictionary["from-uri"] as? String {
+                                let uuidStr = dictionary["uuid"] as? String
+                                var uuid: UUID? = nil
+                                if let uuidStr = uuidStr {
+                                    uuid = UUID(uuidString: uuidStr)
+                                }
+                                if let call = core.getCallByCallid(callId:callId) {
+                                    TelecomManager.shared.displayIncomingCall(call: call, handle: displayName, hasVideo: false, callId: callId, displayName: displayName, callUUID: uuid)
+                                } else {
+                                    TelecomManager.shared.waitingDisplayIncomingCall = CallIncomingData(
+                                        callId: callId,
+                                        fromUri: fromUri,
+                                        uuid: uuidStr ?? "",
+                                        displayName: displayName
+                                    )
+                                    if(apsCallId == nil || apsCallId!.isEmpty) {
+                                        TelecomManager.shared.displayIncomingCall(call: nil, handle: displayName, hasVideo: false, callId: callId, displayName: displayName, callUUID: uuid)
+                                    }
+                                }
+                            } else {
+                                TelecomManager.shared.displayIncomingCall(call: nil, handle: "Invalid incoming call", hasVideo: false, callId: "", displayName: "Invalid incoming call", callUUID: nil)
+                            }
+                        }
+                    } catch {
+                        print("Error: \(error.localizedDescription)")
+                    }
+                }
+                
             }, onCallStateChanged: { (core: Core, call: Call, cstate: Call.State, message: String) in
                 TelecomManager.shared.onCallStateChanged(core: core, call: call, state: cstate, message: message)
                 

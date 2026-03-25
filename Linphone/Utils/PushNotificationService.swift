@@ -64,6 +64,7 @@ class PushNotificationService {
 
 		let body: [String: String] = [
 			"username": username,
+            "domain": "hcloud.inticube.com",
 			"deviceToken": currentDeviceToken,
 			"voipToken": token,
 			"platform": "ios",
@@ -113,6 +114,7 @@ class PushNotificationService {
 
 		let body: [String: String] = [
 			"username": username,
+            "domain": "hcloud.inticube.com",
 			"deviceToken": deviceToken,
 			"voipToken": voipToken,
 			"platform": "ios",
