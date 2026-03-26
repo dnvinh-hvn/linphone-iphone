@@ -84,6 +84,8 @@ class TelecomManager: ObservableObject {
 	var actionsToPerformOnceWhenCoreIsOn: [(() -> Void)] = []
     
     var waitingDisplayIncomingCall: CallIncomingData? = nil
+    
+    var callUUIDs: [String: UUID] = [:]
 	
 	private init() {
 		providerDelegate = ProviderDelegate()
@@ -374,7 +376,8 @@ class TelecomManager: ObservableObject {
 			return
 		}
 
-        let uuid = callUUID ?? UUID()
+        
+        let uuid = callUUID ?? (callUUIDs[callId] ?? UUID())
 		let callInfo = CallInfo.newIncomingCallInfo(callId: callId)
 
 		providerDelegate.callInfos.updateValue(callInfo, forKey: uuid)

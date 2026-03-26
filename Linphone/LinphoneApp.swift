@@ -34,12 +34,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         if let coreContext = coreContext {
             coreContext.doOnCoreQueue { core in
                 core.pushNotificationConfig?.voipToken = deviceToken
-                if let username = core.defaultAccount?.params?.identityAddress?.username {
-                    PushNotificationService.updateVoipToken(deviceToken, username: username)
-                }
+                PushNotificationService.updateVoipToken(deviceToken, address: core.defaultAccount?.params?.identityAddress)
             }
         } else {
-            PushNotificationService.updateVoipToken(deviceToken, username: nil)
+            PushNotificationService.updateVoipToken(deviceToken, address: nil)
         }
     }
     
@@ -82,9 +80,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 		if let coreContext = coreContext {
 			coreContext.doOnCoreQueue { core in
                 core.pushNotificationConfig?.remoteToken = tokenStr
-				if let username = core.defaultAccount?.params?.identityAddress?.username {
-                    PushNotificationService.updateDeviceToken(tokenStr, username: username)
-                }
+                PushNotificationService.updateDeviceToken(tokenStr, address: core.defaultAccount?.params?.identityAddress)
 			}
 		}
 	}
@@ -118,9 +114,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             let tokenStr = token.map { String(format: "%02x", $0) }.joined()
             coreContext.doOnCoreQueue { core in
                 core.pushNotificationConfig?.voipToken = tokenStr
-                if let username = core.defaultAccount?.params?.identityAddress?.username {
-                    PushNotificationService.updateVoipToken(tokenStr, username: username)
-                }
+                PushNotificationService.updateDeviceToken(tokenStr, address: core.defaultAccount?.params?.identityAddress)
             }
         }
 		

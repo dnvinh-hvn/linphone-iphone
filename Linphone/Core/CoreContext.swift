@@ -294,7 +294,7 @@ class CoreContext: ObservableObject {
                                     }
                                 }
                             } else {
-                                TelecomManager.shared.displayIncomingCall(call: nil, handle: "Invalid incoming call", hasVideo: false, callId: "", displayName: "Invalid incoming call", callUUID: nil)
+                                TelecomManager.shared.displayIncomingCall(call: nil, handle: "New incoming call", hasVideo: false, callId: "", displayName: "New incoming call", callUUID: nil)
                             }
                         }
                     } catch {

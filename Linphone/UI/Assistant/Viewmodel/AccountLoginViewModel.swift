@@ -136,8 +136,8 @@ class AccountLoginViewModel: ObservableObject {
 
 					switch state {
 					case .Ok:
-						if let username = account.params?.identityAddress?.username {
-							PushNotificationService.registerIfTokenAvailable(username: username)
+                        if let address = account.params?.identityAddress {
+                            PushNotificationService.registerIfTokenAvailable(address: address)
 						}
 					case .Failed:  // If registration failed, remove account from core
 						if let authInfo = account.findAuthInfo() {
