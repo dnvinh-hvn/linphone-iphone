@@ -48,17 +48,19 @@ class HistoryListViewModel: ObservableObject {
 			
 			// Fetch all call logs if only one account to workaround no history issue
 			// TODO FIXME: remove workaround later
-			let logs = (core.accountList.count > 1)
-				? (account?.callLogs ?? core.callLogs)
-				: core.callLogs
+            let logs = account?.callLogs ?? []
 			
 			var callLogsBis: [HistoryModel] = []
 			var callLogsTmpBis: [HistoryModel] = []
 			
 			logs.forEach { log in
-				let history = HistoryModel(callLog: log)
-				callLogsBis.append(history)
-				callLogsTmpBis.append(history)
+                if log.toAddress?.username?.hasPrefix("*7") != true {
+                    let history = HistoryModel(callLog: log)
+                    callLogsBis.append(history)
+                    callLogsTmpBis.append(history)
+                } else if log.toAddress?.username?.hasPrefix("*7") == true {
+                    core.removeCallLog(callLog: log)
+                }
 			}
 			
 			DispatchQueue.main.async {
@@ -69,7 +71,10 @@ class HistoryListViewModel: ObservableObject {
 				self.callLogsTmp = callLogsTmpBis
 			}
 			
-			self.callLogCoreDelegate = CoreDelegateStub(onCallLogUpdated: { (_: Core, _: CallLog) in
+			self.callLogCoreDelegate = CoreDelegateStub(onCallLogUpdated: { (_: Core, clog: CallLog) in
+                if clog.toAddress?.username?.hasPrefix("*7") == true {
+                    return
+                }
 				let account = core.defaultAccount
 				let logs = account?.callLogs != nil ? account!.callLogs : core.callLogs
 				
@@ -77,9 +82,13 @@ class HistoryListViewModel: ObservableObject {
 				var callLogsTmpBis: [HistoryModel] = []
 				
 				logs.forEach { log in
-					let history = HistoryModel(callLog: log)
-					callLogsBis.append(history)
-					callLogsTmpBis.append(history)
+                    if log.toAddress?.username?.hasPrefix("*7") != true {
+                        let history = HistoryModel(callLog: log)
+                        callLogsBis.append(history)
+                        callLogsTmpBis.append(history)
+                    } else if log.toAddress?.username?.hasPrefix("*7") == true {
+                        core.removeCallLog(callLog: log)
+                    }
 				}
 				
 				DispatchQueue.main.async {

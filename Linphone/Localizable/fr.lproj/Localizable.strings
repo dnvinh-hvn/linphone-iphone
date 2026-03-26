@@ -467,6 +467,15 @@
 "settings_dnd_schedule_end_title" = "Fin";
 "settings_dnd_status_active" = "Mode silencieux actif";
 "settings_dnd_schedule_range" = "Silencieux de %1$@ à %2$@ chaque jour";
+// Call Forward
+"settings_call_forward_section_title" = "Renvoi d'appel";
+"settings_call_forward_enable_title" = "Activer le renvoi d'appel";
+"settings_call_forward_number_label" = "Renvoyer vers";
+"settings_call_forward_number_placeholder" = "Numéro de téléphone";
+"settings_call_forward_save_button" = "Enregistrer";
+"settings_call_forward_active_hint" = "Actif : %@";
+"call_view_forward_active" = "Renvoi vers %@";
+
 "settings_calls_calibrate_echo_canceller_done" = "%@ ms";
 "settings_calls_calibrate_echo_canceller_done_no_echo" = "pas d'écho";
 "settings_calls_calibrate_echo_canceller_failed" = "échec";

@@ -326,6 +326,15 @@
 "settings_dnd_schedule_end_title" = "Ende";
 "settings_dnd_status_active" = "BNS ist jetzt aktiv";
 "settings_dnd_schedule_range" = "Stumm %1$@ – %2$@ täglich";
+// Call Forward
+"settings_call_forward_section_title" = "Anrufweiterleitung";
+"settings_call_forward_enable_title" = "Anrufweiterleitung aktivieren";
+"settings_call_forward_number_label" = "Weiterleiten an";
+"settings_call_forward_number_placeholder" = "Telefonnummer";
+"settings_call_forward_save_button" = "Speichern";
+"settings_call_forward_active_hint" = "Aktiv: %@";
+"call_view_forward_active" = "Weiterleitung an %@";
+
 "settings_calls_calibrate_echo_canceller_title" = "Echokompensator kalibrieren";
 "settings_calls_change_ringtone_title" = "Klingelton ändern";
 "settings_calls_echo_canceller_subtitle" = "Verhindert, dass das Echo am entfernten Ende gehört wird, wenn kein Hardware Echokompensator verfügbar ist";

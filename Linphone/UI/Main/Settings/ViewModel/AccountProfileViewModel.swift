@@ -170,12 +170,8 @@ class AccountProfileViewModel: ObservableObject {
 		CoreContext.shared.doOnCoreQueue { _ in
 			let account = CoreContext.shared.accounts[self.accountModelIndex ?? 0].account
 			if let params = account.params {
-                Log.info("account token: \(account.findAuthInfo()?.accessToken) \(account.findAuthInfo()?.password)")
 				if let copy = params.clone() {
 					copy.registerEnabled = !params.registerEnabled
-					Log.info(
-						"\(AccountProfileViewModel.TAG) Account registration is now \(copy.registerEnabled ? "enabled" : "disabled") for account \(params.identityAddress?.asStringUriOnly())"
-					)
 					account.params = copy
 				}
 			}

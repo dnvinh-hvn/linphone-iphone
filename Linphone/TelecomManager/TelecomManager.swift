@@ -583,8 +583,8 @@ class TelecomManager: ObservableObject {
 			switch cstate {
 			case .IncomingReceived:
 				let addr = call.remoteAddress
-//				incomingDisplayName(call: call) { displayNameResult in
-//					let displayName = displayNameResult
+				incomingDisplayName(call: call) { displayNameResult in
+					let displayName = displayNameResult
 	#if targetEnvironment(simulator)
 					DispatchQueue.main.async {
 						self.outgoingCallStarted = false
@@ -598,19 +598,19 @@ class TelecomManager: ObservableObject {
 					}
 	#endif
 					if TelecomManager.callKitEnabled(core: core) {
-//						let uuid = self.providerDelegate.uuids["\(callId)"]
-//						TelecomManager.uuidReplacedCall = callId
+						let uuid = self.providerDelegate.uuids["\(callId)"]
+						TelecomManager.uuidReplacedCall = callId
 						
-//						if uuid != nil {
-							// Tha app is now registered, updated the call already existed.
-//							self.providerDelegate.updateCall(uuid: uuid!, handle: addr!.asStringUriOnly(), hasVideo: self.remoteConfVideo, displayName: displayName)
-//						} else {
-//							let videoEnabled = call.remoteParams?.videoEnabled ?? false
-//							let isConference = call.callLog?.wasConference() ?? false
-//							let videoDir = call.remoteParams?.videoDirection != MediaDirection.Inactive
-//							self.displayIncomingCall(call: call, handle: addr!.asStringUriOnly(), hasVideo: videoEnabled && videoDir && !isConference, callId: callId, displayName: displayName)
-//						}
-//					}
+						if uuid != nil {
+//							 The app is now registered, updated the call already existed.
+							self.providerDelegate.updateCall(uuid: uuid!, handle: addr!.asStringUriOnly(), hasVideo: self.remoteConfVideo, displayName: displayName)
+						} else {
+							let videoEnabled = call.remoteParams?.videoEnabled ?? false
+							let isConference = call.callLog?.wasConference() ?? false
+							let videoDir = call.remoteParams?.videoDirection != MediaDirection.Inactive
+							self.displayIncomingCall(call: call, handle: addr!.asStringUriOnly(), hasVideo: videoEnabled && videoDir && !isConference, callId: callId, displayName: displayName)
+						}
+					}
 				}
 			case .StreamsRunning:
 				if TelecomManager.callKitEnabled(core: core) {

@@ -16,3 +16,12 @@
 "settings_dnd_schedule_end_title" = "End";
 "settings_dnd_status_active" = "DND is active now";
 "settings_dnd_schedule_range" = "Silent %1$@ – %2$@ every day";
+// Call Forward
+"settings_call_forward_section_title" = "Call Forward";
+"settings_call_forward_enable_title" = "Enable Call Forward";
+"settings_call_forward_number_label" = "Forward to";
+"settings_call_forward_number_placeholder" = "Phone number";
+"settings_call_forward_save_button" = "Save";
+"settings_call_forward_active_hint" = "Active: %@";
+"call_view_forward_active" = "Forwarding to %@";
+
