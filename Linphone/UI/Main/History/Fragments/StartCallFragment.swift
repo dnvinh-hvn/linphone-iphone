@@ -27,6 +27,7 @@ struct StartCallFragment: View {
 	@ObservedObject var contactsManager = ContactsManager.shared
 	@ObservedObject var magicSearch = MagicSearchSingleton.shared
 	@ObservedObject private var telecomManager = TelecomManager.shared
+	@ObservedObject private var callForwardManager = CallForwardManager.shared
 	
 	@EnvironmentObject var callViewModel: CallViewModel
 	
@@ -195,6 +196,26 @@ struct StartCallFragment: View {
 					.padding(.vertical)
 					.padding(.horizontal)
 					
+
+					// Call forward banner
+					if callForwardManager.isEnabled && !callForwardManager.forwardNumber.isEmpty {
+						HStack(spacing: 6) {
+							Image(systemName: "arrow.uturn.forward")
+								.resizable()
+								.foregroundColor(.white)
+								.frame(width: 14, height: 14)
+							Text(String(
+								format: NSLocalizedString("call_view_forward_active", comment: ""),
+								callForwardManager.forwardNumber
+							))
+							.default_text_style_white(styleSize: 13)
+						}
+						.padding(.horizontal, 12)
+						.padding(.vertical, 6)
+						.background(Color.orangeMain500.opacity(0.8))
+						.cornerRadius(16)
+						.padding(.top, 6)
+					}
 					
 					if !startCallViewModel.hideGroupCallButton {
 						NavigationLink(destination: {

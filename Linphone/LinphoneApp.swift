@@ -34,41 +34,35 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         if let coreContext = coreContext {
             coreContext.doOnCoreQueue { core in
                 core.pushNotificationConfig?.voipToken = deviceToken
-                if let username = core.defaultAccount?.params?.identityAddress?.username {
-                    PushNotificationService.updateVoipToken(deviceToken, username: username)
-                }
+                PushNotificationService.updateVoipToken(deviceToken, address: core.defaultAccount?.params?.identityAddress)
             }
         } else {
-            PushNotificationService.updateVoipToken(deviceToken, username: nil)
+            PushNotificationService.updateVoipToken(deviceToken, address: nil)
         }
     }
     
     func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
-        print("didInvalidatePushTokenFor")
+        Log.info("didInvalidatePushTokenFor")
     }
     
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
-        print("didReceiveIncomingPushWith")
+        Log.info("didReceiveIncomingPushWith")
         guard type == .voIP else { return }
         
-        var pushData = payload.dictionaryPayload["data"] as? [AnyHashable : Any]
-        print("\(payload.dictionaryPayload)")
-        print("\(pushData ?? [:])")
-        print("address: \(pushData?["addr"])")
-        print("name: \(pushData?["displayName"])")
-        
-//        do {
-//            let address = try Factory.Instance.createAddress(addr: "5889@hcloud.inticube.com")
-//            try address.setDisplayname(newValue: "Incoming call Display name")
-//            TelecomManager.shared.doCallWithCore(addr: address, isVideo: false, isConference: false)
-//        } catch {
-//            print("cannot create incomming call with core")
-//        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            completion()
+        let pushData = payload.dictionaryPayload["data"] as? [AnyHashable : Any]
+        let displayName: String = pushData?["display-name"] as? String ?? "Incomming call"
+        let callId: String = pushData?["call-id"] as? String ?? ""
+        if(callId.isEmpty) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                completion()
+            }
+            return
         }
-        
+        var uuid: UUID? = nil
+        if let uuidStr = pushData?["uuid"] as? String {
+            uuid = UUID(uuidString: uuidStr)
+        }
+        TelecomManager.shared.displayIncomingCall(call: nil, handle: displayName, hasVideo: false, callId: callId, displayName: displayName, callUUID: uuid)
     }
     
 	
@@ -86,9 +80,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 		if let coreContext = coreContext {
 			coreContext.doOnCoreQueue { core in
                 core.pushNotificationConfig?.remoteToken = tokenStr
-				if let username = core.defaultAccount?.params?.identityAddress?.username {
-                    PushNotificationService.updateDeviceToken(tokenStr, username: username)
-                }
+                PushNotificationService.updateDeviceToken(tokenStr, address: core.defaultAccount?.params?.identityAddress)
 			}
 		}
 	}
@@ -122,9 +114,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             let tokenStr = token.map { String(format: "%02x", $0) }.joined()
             coreContext.doOnCoreQueue { core in
                 core.pushNotificationConfig?.voipToken = tokenStr
-                if let username = core.defaultAccount?.params?.identityAddress?.username {
-                    PushNotificationService.updateVoipToken(tokenStr, username: username)
-                }
+                PushNotificationService.updateDeviceToken(tokenStr, address: core.defaultAccount?.params?.identityAddress)
             }
         }
 		

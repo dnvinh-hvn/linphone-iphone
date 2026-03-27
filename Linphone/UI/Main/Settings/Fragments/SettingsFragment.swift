@@ -24,6 +24,7 @@ struct SettingsFragment: View {
 
 	@StateObject private var settingsViewModel = SettingsViewModel()
 	@ObservedObject private var dndManager = DNDManager.shared
+	@ObservedObject private var callForwardManager = CallForwardManager.shared
 
 	@Binding var isShowSettingsFragment: Bool
 
@@ -181,6 +182,82 @@ struct SettingsFragment: View {
 										}
 										.padding(.horizontal, 20)
 										.padding(.vertical, 10)
+									}
+								}
+								.background(.white)
+								.cornerRadius(15)
+								.padding(.bottom, 4)
+							}
+
+							// MARK: - Call Forward
+							VStack(alignment: .leading, spacing: 0) {
+
+								// Section header
+								Text("settings_call_forward_section_title")
+									.default_text_style_orange_800(styleSize: 13)
+									.padding(.horizontal, 20)
+									.padding(.top, 16)
+									.padding(.bottom, 8)
+
+								VStack(spacing: 0) {
+
+									// --- Enable toggle ---
+									Toggle(isOn: $callForwardManager.isEnabled) {
+										VStack(alignment: .leading, spacing: 2) {
+											Text("settings_call_forward_enable_title")
+												.default_text_style_700(styleSize: 15)
+											if callForwardManager.isEnabled && !callForwardManager.forwardNumber.isEmpty {
+												Text(String(
+													format: NSLocalizedString("settings_call_forward_active_hint", comment: ""),
+													callForwardManager.forwardNumber
+												))
+												.default_text_style(styleSize: 12)
+												.foregroundColor(Color.orangeMain500)
+											}
+										}
+									}
+									.padding(.horizontal, 20)
+									.padding(.vertical, 16)
+
+									// --- Number field and Save (visible when enabled) ---
+									if callForwardManager.isEnabled {
+										Divider().padding(.leading, 20)
+
+										HStack {
+											Text("settings_call_forward_number_label")
+												.default_text_style_700(styleSize: 15)
+											Spacer()
+											TextField(
+												NSLocalizedString("settings_call_forward_number_placeholder", comment: ""),
+												text: $callForwardManager.forwardNumber
+											)
+											.keyboardType(.phonePad)
+											.multilineTextAlignment(.trailing)
+											.default_text_style(styleSize: 15)
+											.frame(maxWidth: 180)
+										}
+										.padding(.horizontal, 20)
+										.padding(.vertical, 14)
+
+										Divider().padding(.leading, 20)
+
+										Button {
+                                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+											callForwardManager.activate()
+										} label: {
+											HStack {
+												Spacer()
+												Text("settings_call_forward_save_button")
+													.default_text_style_white_700(styleSize: 15)
+												Spacer()
+											}
+											.frame(height: 44)
+											.background(callForwardManager.forwardNumber.isEmpty ? Color.gray200 : Color.orangeMain500)
+											.cornerRadius(10)
+										}
+										.disabled(callForwardManager.forwardNumber.isEmpty)
+										.padding(.horizontal, 20)
+										.padding(.vertical, 14)
 									}
 								}
 								.background(.white)

@@ -6,6 +6,7 @@
  */
 
 import Foundation
+import linphonesw
 
 class PushNotificationService {
 
@@ -17,35 +18,39 @@ class PushNotificationService {
 
 	/// Call whenever a new VoIP token arrives from PKPushRegistry.
 	/// If a user is already logged in the token is registered immediately.
-	static func updateVoipToken(_ token: String, username: String?) {
+    static func updateVoipToken(_ token: String, address: Address?) {
 		Log.info("[PushNotificationService] VoIP token updated: \(token)")
 		currentVoipToken = token
-		if let username = username, !username.isEmpty {
-			registerDevice(username: username, voipToken: token, deviceToken: currentDeviceToken)
+        if let username = address?.username, !username.isEmpty {
+            let domain = address?.domain
+            registerDevice(username: username, voipToken: token, deviceToken: currentDeviceToken, domain: domain)
 		}
 	}
 
-	static func updateDeviceToken(_ token: String, username: String?) {
+    static func updateDeviceToken(_ token: String, address: Address?) {
 		Log.info("[PushNotificationService] Device token updated: \(token)")
 		if(currentDeviceToken != token) {
 			currentDeviceToken = token
-			if let username = username, !username.isEmpty {
-				registerIfTokenAvailable(username: username)
+            if let address = address {
+                registerIfTokenAvailable(address: address)
 			}
 		}
 	}
 
 	/// Call after a successful SIP registration so the server knows about this device.
-	static func registerIfTokenAvailable(username: String) {
+    static func registerIfTokenAvailable(address: Address) {
 		guard let token = currentVoipToken else {
 			Log.warn("[PushNotificationService] registerIfTokenAvailable: no VoIP token yet, skipping")
 			return
 		}
-		registerDevice(username: username, voipToken: token, deviceToken: currentDeviceToken)
+        if let username = address.username {
+            let domain = address.domain
+            registerDevice(username: username, voipToken: token, deviceToken: currentDeviceToken, domain: domain)
+        }
 	}
 
 	/// Call when the user logs out so the server stops delivering pushes to this device.
-	static func unregisterDevice(username: String) {
+    static func unregisterDevice(address: Address?) {
 		guard let token = currentVoipToken else {
 			Log.warn("[PushNotificationService] unregisterDevice: no VoIP token cached, skipping")
 			return
@@ -61,9 +66,11 @@ class PushNotificationService {
 #else
     let pushEnvironment = "production"
 #endif
-
+        let username = address?.username ?? ""
+        let domain = address?.domain
 		let body: [String: String] = [
 			"username": username,
+            "domain": domain ?? "hcloud.inticube.com",
 			"deviceToken": currentDeviceToken,
 			"voipToken": token,
 			"platform": "ios",
@@ -99,7 +106,7 @@ class PushNotificationService {
 
 	// MARK: - Private
 
-	static func registerDevice(username: String, voipToken: String, deviceToken: String) {
+    static func registerDevice(username: String, voipToken: String, deviceToken: String, domain: String?) {
 		guard let url = URL(string: "\(serverBaseUrl)/api/notifications/register") else {
 			Log.error("[PushNotificationService] Invalid server URL")
 			return
@@ -113,11 +120,14 @@ class PushNotificationService {
 
 		let body: [String: String] = [
 			"username": username,
+            "domain": domain ?? "hcloud.inticube.com",
 			"deviceToken": deviceToken,
 			"voipToken": voipToken,
 			"platform": "ios",
 			"environment": pushEnvironment
 		]
+        
+        Log.info("register voip token for \(username) - \(String(describing: domain))")
 
 		guard let httpBody = try? JSONSerialization.data(withJSONObject: body) else {
 			Log.error("[PushNotificationService] Failed to serialise request body")

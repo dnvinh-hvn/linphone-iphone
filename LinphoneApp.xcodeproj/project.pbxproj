@@ -41,6 +41,7 @@
 		66FDB7812C7C689A00561566 /* EventEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FDB7802C7C689A00561566 /* EventEditViewController.swift */; };
 		8F34B1262F63E56700B95ED6 /* PushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F34B1252F63E56700B95ED6 /* PushNotificationService.swift */; };
 		8F34B1282F68EF4000B95ED6 /* DNDManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F34B1272F68EF4000B95ED6 /* DNDManager.swift */; };
+		8FB46DC42F74E6B5007EEFD9 /* CallForwardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB46DC32F74E6B5007EEFD9 /* CallForwardManager.swift */; };
 		C60E8F192C0F649200A06DB8 /* UIApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60E8F182C0F649200A06DB8 /* UIApplicationExtension.swift */; };
 		C618BF562D75CA03005A00E0 /* linphonesw in Frameworks */ = {isa = PBXBuildFile; productRef = C618BF552D75CA03005A00E0 /* linphonesw */; };
 		C618BF582D75CA0D005A00E0 /* linphonesw in Frameworks */ = {isa = PBXBuildFile; productRef = C618BF572D75CA0D005A00E0 /* linphonesw */; };
@@ -281,6 +282,7 @@
 		66FDB7802C7C689A00561566 /* EventEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEditViewController.swift; sourceTree = "<group>"; };
 		8F34B1252F63E56700B95ED6 /* PushNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationService.swift; sourceTree = "<group>"; };
 		8F34B1272F68EF4000B95ED6 /* DNDManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNDManager.swift; sourceTree = "<group>"; };
+		8FB46DC32F74E6B5007EEFD9 /* CallForwardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallForwardManager.swift; sourceTree = "<group>"; };
 		C60E8F182C0F649200A06DB8 /* UIApplicationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplicationExtension.swift; sourceTree = "<group>"; };
 		C62817272C1B389700DBA646 /* SideMenuAccountRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuAccountRow.swift; sourceTree = "<group>"; };
 		C628172D2C1C3A3600DBA646 /* AccountExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountExtension.swift; sourceTree = "<group>"; };
@@ -626,6 +628,7 @@
 		D717071C2AC591EF0037746F /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				8FB46DC32F74E6B5007EEFD9 /* CallForwardManager.swift */,
 				8F34B1272F68EF4000B95ED6 /* DNDManager.swift */,
 				8F34B1252F63E56700B95ED6 /* PushNotificationService.swift */,
 				C642277A2E8E4AC50094FEDC /* ThemeManager.swift */,
@@ -1437,6 +1440,7 @@
 				C6A5A9482C10B6A30070FEA4 /* AuthState.swift in Sources */,
 				D72992392ADD7F68003AF125 /* HistoryContactFragment.swift in Sources */,
 				D711B1342E93F18700DF8C71 /* LdapServerConfigurationFragment.swift in Sources */,
+				8FB46DC42F74E6B5007EEFD9 /* CallForwardManager.swift in Sources */,
 				D70A26F02B7D02E6006CC8FC /* ConversationViewModel.swift in Sources */,
 				6613A0AE2BAEB7DF008923A4 /* MeetingFragment.swift in Sources */,
 				D7B5066D2AEFA9B900CEB4E9 /* ContactInnerFragment.swift in Sources */,
@@ -1811,7 +1815,7 @@
 				CODE_SIGN_ENTITLEMENTS = Linphone/Linphone.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"Linphone/Preview Content\"";
@@ -1878,7 +1882,7 @@
 				CODE_SIGN_ENTITLEMENTS = Linphone/Linphone.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Linphone/Preview Content\"";
 				DEVELOPMENT_TEAM = LM262B35XA;

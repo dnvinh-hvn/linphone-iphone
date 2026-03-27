@@ -172,9 +172,6 @@ class AccountProfileViewModel: ObservableObject {
 			if let params = account.params {
 				if let copy = params.clone() {
 					copy.registerEnabled = !params.registerEnabled
-					Log.info(
-						"\(AccountProfileViewModel.TAG) Account registration is now \(copy.registerEnabled ? "enabled" : "disabled") for account \(params.identityAddress?.asStringUriOnly())"
-					)
 					account.params = copy
 				}
 			}

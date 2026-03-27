@@ -2,10 +2,10 @@
 ## Start of default rc
 
 [sip]
-contact="Linphone iPhone" <sip:linphone.iphone@unknown-host>
+contact="Softphone iPhone" <mail:dnvinh@marusysvina.com>
 use_info=0
-use_ipv6=1
-keepalive_period=30000
+use_ipv6=0
+keepalive_period=10000
 sip_port=-1
 sip_tcp_port=-1
 sip_tls_port=-1
@@ -36,9 +36,9 @@ host=
 port=443
 
 [misc]
-log_collection_upload_server_url=https://files.linphone.org/http-file-transfer-server/hft.php
-file_transfer_server_url=https://files.linphone.org/http-file-transfer-server/hft.php
-version_check_url_root=https://download.linphone.org/releases
+log_collection_upload_server_url=
+file_transfer_server_url=
+version_check_url_root=
 max_calls=10
 history_max_size=100
 conference_layout=1

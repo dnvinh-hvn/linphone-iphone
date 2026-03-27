@@ -32,7 +32,19 @@ class CallAppData: NSObject {
 	var batteryWarningShown = false
 	var videoRequested = false /*set when user has requested for video*/
 	var isConference = false
-	
+}
+
+class CallIncomingData {
+    var callId: String = ""
+    var fromUri: String = ""
+    var uuid: String = ""
+    var displayName: String = ""
+    init(callId: String, fromUri: String, uuid: String, displayName: String) {
+        self.callId = callId
+        self.fromUri = fromUri
+        self.uuid = uuid
+        self.displayName = displayName
+    }
 }
 
 class TelecomManager: ObservableObject {
@@ -70,6 +82,10 @@ class TelecomManager: ObservableObject {
 	var referedFromCall: String?
 	var referedToCall: String?
 	var actionsToPerformOnceWhenCoreIsOn: [(() -> Void)] = []
+    
+    var waitingDisplayIncomingCall: CallIncomingData? = nil
+    
+    var callUUIDs: [String: UUID] = [:]
 	
 	private init() {
 		providerDelegate = ProviderDelegate()
@@ -348,7 +364,8 @@ class TelecomManager: ObservableObject {
 		}
 	}
 	
-	func displayIncomingCall(call: Call?, handle: String, hasVideo: Bool, callId: String, displayName: String) {
+    func displayIncomingCall(call: Call?, handle: String, hasVideo: Bool, callId: String, displayName: String, callUUID: UUID? = nil) {
+        Log.info("display incoming call \(callId)")
 		if DNDManager.shared.isCurrentlyActive {
 			Log.info("[TelecomManager] DND is active — declining incoming call \(callId)")
 			if let call = call {
@@ -359,7 +376,8 @@ class TelecomManager: ObservableObject {
 			return
 		}
 
-		let uuid = UUID()
+        
+        let uuid = callUUID ?? (callUUIDs[callId] ?? UUID())
 		let callInfo = CallInfo.newIncomingCallInfo(callId: callId)
 
 		providerDelegate.callInfos.updateValue(callInfo, forKey: uuid)
@@ -469,7 +487,9 @@ class TelecomManager: ObservableObject {
 		
 		if cstate == .PushIncomingReceived {
 			Log.info("PushIncomingReceived in core delegate, display callkit call")
-			TelecomManager.shared.displayIncomingCall(call: call, handle: "Calling", hasVideo: false, callId: callId, displayName: "Calling")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                TelecomManager.shared.displayIncomingCall(call: call, handle: self.waitingDisplayIncomingCall?.displayName ?? "Calling", hasVideo: false, callId: callId, displayName: self.waitingDisplayIncomingCall?.displayName ?? "Calling")
+            }
 		} else {
 			// let oldRemoteConfVideo = self.remoteConfVideo
 			
@@ -582,7 +602,7 @@ class TelecomManager: ObservableObject {
 						TelecomManager.uuidReplacedCall = callId
 						
 						if uuid != nil {
-							// Tha app is now registered, updated the call already existed.
+//							 The app is now registered, updated the call already existed.
 							self.providerDelegate.updateCall(uuid: uuid!, handle: addr!.asStringUriOnly(), hasVideo: self.remoteConfVideo, displayName: displayName)
 						} else {
 							let videoEnabled = call.remoteParams?.videoEnabled ?? false
