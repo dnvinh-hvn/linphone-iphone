@@ -52,45 +52,40 @@ struct ContactRow: View {
 	
 	var body: some View {
 		HStack {
-			HStack {
-				if index <= 0
-					|| (index < contactsManager.avatarListModel.count && contactAvatarModel.name.lowercased().folding(
-						options: .diacriticInsensitive,
-						locale: .current
-					).first
-					!= contactsManager.avatarListModel[index-1].name.lowercased().folding(
-						options: .diacriticInsensitive,
-						locale: .current
-					).first) {
-					Text(
-						String(
-							(contactAvatarModel.name.uppercased().folding(
-								options: .diacriticInsensitive,
-								locale: .current
-							).first) ?? "?"))
-					.contact_text_style_500(styleSize: 20)
-					.frame(width: 18)
-					.padding(.leading, -5)
-					.padding(.trailing, 10)
-				} else {
-					Text("")
-						.contact_text_style_500(styleSize: 20)
-						.frame(width: 18)
-						.padding(.leading, -5)
-						.padding(.trailing, 10)
-				}
-				
-				Avatar(contactAvatarModel: contactAvatarModel, avatarSize: 50)
-				
-				Text(contactAvatarModel.name)
-					.default_text_style(styleSize: 16)
-					.frame(maxWidth: .infinity, alignment: .leading)
-					.foregroundStyle(Color.orangeMain500)
-			}
+            Avatar(contactAvatarModel: contactAvatarModel, avatarSize: 50)
+            
+            VStack(alignment: .leading) {
+                Text(contactAvatarModel.name)
+                    .text_style(fontSize: 16, fontWeight: 500, fontColor: .black)
+                
+                Text(contactAvatarModel.organization.isEmpty ? "-" : contactAvatarModel.organization)
+                    .text_style(fontSize: 16, fontWeight: 500, fontColor: .blue)
+                
+                Text(contactAvatarModel.jobTitle.isEmpty ? "-" : contactAvatarModel.jobTitle)
+                    .text_style(fontSize: 14, fontWeight: 500, fontColor: .gray)
+            }
+            
+            Spacer()
+            
+            Image(systemName: "message")
+                .resizable()
+                .frame(width: 25, height: 25)
+                .padding(.trailing, 8)
+            
+            Image(systemName: "phone")
+                .resizable()
+                .frame(width: 25, height: 25)
 		}
-		.frame(height: 50)
+        .padding(8)
+        .background(Color.white)
+        .padding(.horizontal, 8)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(Color.gray.opacity(0.5))
+                .frame(height: 1)
+        }
 		.buttonStyle(.borderless)
-		.listRowInsets(EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 20))
+		.listRowInsets(EdgeInsets())
 		.listRowSeparator(.hidden)
 		.background(.white)
 		.onTapGesture {
